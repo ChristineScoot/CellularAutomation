@@ -1,0 +1,16 @@
+.anchorpane {
+    -fx-background-color: white;
+}
+.button{
+    -fx-padding: 5 10 5 10;
+    -fx-background-color: #5fb0ff;
+    -fx-background-radius: 20;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 12pt;
+}
+.label{
+    -fx-font-size: 11pt;
+    -fx-text-decoration:bold;
+    -fx-font-weight: bold;
+    -fx-text-fill: #47a6ff;
+}

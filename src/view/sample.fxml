@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.AnchorPane?>
+<AnchorPane fx:id="anchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="800.0" styleClass="anchorpane" stylesheets="@theme.css" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
+    <Canvas fx:id="canvas" height="400.0" layoutY="100.0" width="600.0" />
+    <Label layoutX="14.0" layoutY="19.0" text="RULE" />
+    <TextField fx:id="textFieldRule" layoutX="57.0" layoutY="14.0" onKeyPressed="#textFieldKeyAction" prefHeight="31.0" prefWidth="65.0" text="30" />
+    <Label layoutX="129.0" layoutY="19.0" text="WIDTH" />
+    <TextField fx:id="width" layoutX="187.0" layoutY="14.0" onKeyPressed="#textFieldKeyAction" prefHeight="31.0" prefWidth="65.0" text="30" />
+    <Label layoutX="259.0" layoutY="19.0" text="HEIGHT" />
+    <TextField fx:id="height" layoutX="321.0" layoutY="14.0" onKeyPressed="#textFieldKeyAction" prefHeight="31.0" prefWidth="65.0" text="15" />
+    <Button fx:id="buttonOneD" layoutX="650.0" layoutY="10.0" minWidth="120" mnemonicParsing="false" onAction="#handleButtonOneD" text="Calculate 1D" />
+    <Button fx:id="ButtonFixed" layoutX="650.0" layoutY="60.0" minWidth="120" mnemonicParsing="false" onAction="#handleButtonFixed" text="fixed" />
+    <Button fx:id="buttonGlider" layoutX="650.0" layoutY="110.0" mnemonicParsing="false" onAction="#handleButtonGlider" prefWidth="120" text="glider" />
+    <Button fx:id="buttonUserDefine" layoutX="650.0" layoutY="160.0" minWidth="120" mnemonicParsing="false" onAction="#handleButtonUserDefined" text="user defined" />
+    <Button fx:id="buttonOscillate" layoutX="650.0" layoutY="210.0" minWidth="120" mnemonicParsing="false" onAction="#handleButtonOscillator" text="oscillator" />
+    <Button fx:id="buttonRandom" layoutX="650.0" layoutY="260.0" minWidth="120" mnemonicParsing="false" onAction="#handleButtonRandom" text="random" />
+    <Button fx:id="buttonStart" layoutX="650.0" layoutY="310.0" minWidth="60" mnemonicParsing="false" onAction="#handleStartButtonAction" text="start" />
+    <Button fx:id="buttonStop" layoutX="710.0" layoutY="310.0" minWidth="60" mnemonicParsing="false" onAction="#handleStopButtonAction" text="stop" />
+   <ProgressBar fx:id="progressBar" layoutX="645.0" layoutY="408.0" prefHeight="23.0" prefWidth="131.0" progress="0.0" />
+</AnchorPane>
