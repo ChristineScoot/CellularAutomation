@@ -32,23 +32,23 @@ public class Controller {
 
     private void initialize() {
         progressBar.progressProperty().unbind();
-        heightInt = Integer.parseInt(this.height.getCharacters().toString());
-        widthInt = Integer.parseInt(this.width.getCharacters().toString());
+        heightInt = Integer.parseInt(this.height.getText());
+        widthInt = Integer.parseInt(this.width.getText());
         initializeState = new boolean[heightInt][widthInt];
     }
 
     @FXML
     private void handleButtonOneD() {
-        int rule = Integer.parseInt(textFieldRule.getCharacters().toString());
-        int generations = Integer.parseInt(height.getCharacters().toString());
-        int length = Integer.parseInt(width.getCharacters().toString());
+        int rule = Integer.parseInt(textFieldRule.getText());
+        int generations = Integer.parseInt(height.getText());
+        int length = Integer.parseInt(width.getText());
         GraphicsContext gc = canvas.getGraphicsContext2D();
         resetCanvas(gc);
         new CellularAutomation(rule, gc, generations, length);
     }
 
     @FXML
-    private void handleButtonFixed() throws InterruptedException {
+    private void handleButtonFixed() {
         initialize();
         for (boolean[] row : initializeState)
             for (boolean cell : row)
@@ -65,7 +65,7 @@ public class Controller {
     }
 
     @FXML
-    private void handleButtonGlider() throws InterruptedException {
+    private void handleButtonGlider() {
         initialize();
         for (boolean[] row : initializeState)
             for (boolean cell : row)
@@ -81,7 +81,7 @@ public class Controller {
     }
 
     @FXML
-    private void handleButtonUserDefined() throws InterruptedException {
+    private void handleButtonUserDefined() {
         initialize();
         for (boolean[] row : initializeState)
             for (boolean cell : row)
@@ -92,7 +92,7 @@ public class Controller {
     }
 
     @FXML
-    private void handleButtonOscillator() throws InterruptedException {
+    private void handleButtonOscillator() {
         initialize();
         for (boolean[] row : initializeState)
             for (boolean cell : row)
@@ -106,7 +106,7 @@ public class Controller {
     }
 
     @FXML
-    private void handleButtonRandom() throws InterruptedException {
+    private void handleButtonRandom() {
         initialize();
         for (boolean[] row : initializeState)
             for (boolean cell : row)

@@ -11,7 +11,7 @@ public class CellularAutomation2D extends Task {
     private int height, width;
     private boolean[][] previousState, currentState;
 
-    public CellularAutomation2D(GraphicsContext gc, int height, int width, boolean[][] currentState) throws InterruptedException {
+    public CellularAutomation2D(GraphicsContext gc, int height, int width, boolean[][] currentState) {
         this.gc = gc;
         this.height = height;
         this.width = width;
@@ -96,9 +96,11 @@ public class CellularAutomation2D extends Task {
         int row, column;
         column = (int) (x / pointSize);
         row = (int) (y / pointSize);
-        currentState[row][column] = !currentState[row][column];
-        updatePreviousGeneration();
-        printStep(previousState);
+        if (row < height && column < width) {
+            currentState[row][column] = !currentState[row][column];
+            updatePreviousGeneration();
+            printStep(previousState);
+        }
     }
 
     @Override
