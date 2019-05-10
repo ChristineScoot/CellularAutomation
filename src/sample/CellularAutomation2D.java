@@ -22,7 +22,7 @@ public class CellularAutomation2D extends Task {
     }
 
     private void printStep(boolean[][] step) {
-        double pointSize = 600.0 / width;
+        double pointSize = getPointSize();
         BufferedImage bi = new BufferedImage((int) (width * pointSize), (int) (height * pointSize), BufferedImage.TYPE_INT_RGB);
         double canvasX;
         double canvasY = 0.0;
@@ -52,7 +52,7 @@ public class CellularAutomation2D extends Task {
 
     public void calculate() throws InterruptedException {
         while (true) {
-            Thread.sleep(10);
+            Thread.sleep(50);
             for (int i = 0; i < height; i++)
                 for (int j = 0; j < width; j++) {
                     int numberOfNeighbours = countNeighbours(i, j);
@@ -92,15 +92,20 @@ public class CellularAutomation2D extends Task {
     }
 
     public void setCell(int x, int y) {
-        double pointSize = 600.0 / width;
         int row, column;
-        column = (int) (x / pointSize);
-        row = (int) (y / pointSize);
+        column = (int) (x / getPointSize());
+        row = (int) (y / getPointSize());
         if (row < height && column < width) {
             currentState[row][column] = !currentState[row][column];
             updatePreviousGeneration();
             printStep(previousState);
         }
+    }
+
+    private double getPointSize() {
+        double pointSizeWidth = 600.0 / width;
+        double pointSizeHeight = 400.0 / height;
+        return (pointSizeWidth < pointSizeHeight ? pointSizeWidth : pointSizeHeight);
     }
 
     @Override

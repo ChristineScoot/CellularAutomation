@@ -1,5 +1,6 @@
 package sample;
 
+import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -9,6 +10,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
 
+import java.awt.image.BufferedImage;
 import java.util.Random;
 
 public class Controller {
@@ -25,6 +27,8 @@ public class Controller {
 
     private CellularAutomation2D cellularAutomation2D;
     private Thread thread = new Thread();
+    private GraphicsContext gc;
+
 
     private int heightInt;
     private int widthInt;
@@ -35,15 +39,16 @@ public class Controller {
         heightInt = Integer.parseInt(this.height.getText());
         widthInt = Integer.parseInt(this.width.getText());
         initializeState = new boolean[heightInt][widthInt];
+        gc = canvas.getGraphicsContext2D();
+        resetCanvas();
     }
 
     @FXML
     private void handleButtonOneD() {
+        initialize();
         int rule = Integer.parseInt(textFieldRule.getText());
         int generations = Integer.parseInt(height.getText());
         int length = Integer.parseInt(width.getText());
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-        resetCanvas(gc);
         new CellularAutomation(rule, gc, generations, length);
     }
 
@@ -75,7 +80,7 @@ public class Controller {
         initializeState[4][1] = true;
         initializeState[4][2] = true;
         initializeState[5][3] = true;
-        cellularAutomation2D = new CellularAutomation2D(canvas.getGraphicsContext2D(), heightInt, widthInt, initializeState);
+        cellularAutomation2D = new CellularAutomation2D(gc, heightInt, widthInt, initializeState);
         setUserDefinedListener();
         thread = new Thread(cellularAutomation2D);
     }
@@ -86,7 +91,7 @@ public class Controller {
         for (boolean[] row : initializeState)
             for (boolean cell : row)
                 cell = false;
-        cellularAutomation2D = new CellularAutomation2D(canvas.getGraphicsContext2D(), heightInt, widthInt, initializeState);
+        cellularAutomation2D = new CellularAutomation2D(gc, heightInt, widthInt, initializeState);
         setUserDefinedListener();
         thread = new Thread(cellularAutomation2D);
     }
@@ -100,7 +105,7 @@ public class Controller {
         initializeState[3][3] = true;
         initializeState[4][3] = true;
         initializeState[5][3] = true;
-        cellularAutomation2D = new CellularAutomation2D(canvas.getGraphicsContext2D(), heightInt, widthInt, initializeState);
+        cellularAutomation2D = new CellularAutomation2D(gc, heightInt, widthInt, initializeState);
         setUserDefinedListener();
         thread = new Thread(cellularAutomation2D);
     }
@@ -118,7 +123,7 @@ public class Controller {
             int column = generator.nextInt(widthInt);
             initializeState[row][column] = true;
         }
-        cellularAutomation2D = new CellularAutomation2D(canvas.getGraphicsContext2D(), heightInt, widthInt, initializeState);
+        cellularAutomation2D = new CellularAutomation2D(gc, heightInt, widthInt, initializeState);
         setUserDefinedListener();
         thread = new Thread(cellularAutomation2D);
     }
@@ -130,12 +135,21 @@ public class Controller {
         });
     }
 
-    private void resetCanvas(GraphicsContext gc) {
+    private void resetCanvas() {
         gc.setFill(Color.WHITE);
         gc.clearRect(canvas.getLayoutX(),
                 canvas.getLayoutY(),
                 canvas.getWidth(),
                 canvas.getHeight());
+
+        BufferedImage bi = new BufferedImage((int) canvas.getWidth(), (int) canvas.getHeight(), BufferedImage.TYPE_INT_RGB);
+        for (int i = 0; i < (int) canvas.getWidth(); i++) {
+            for (int j = 0; j < (int) canvas.getHeight(); j++) {
+                bi.setRGB(i, j, 16777215);
+            }
+        }
+
+        gc.drawImage(SwingFXUtils.toFXImage(bi, null), 0, 0);
     }
 
     public void textFieldKeyAction(KeyEvent keyEvent) {
