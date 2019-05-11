@@ -1,4 +1,4 @@
-package sample;
+package controller;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
@@ -57,7 +57,7 @@ public class CellularAutomation {
     }
 
     private void printGeneration(boolean[] generation) {
-        double pointSize = 600.0 / length;
+        double pointSize = gc.getCanvas().getWidth() / length;
         double canvasX = 0.0;
         for (int i = 0; i < length; i++) {
             if (generation[i])

@@ -1,19 +1,24 @@
-package sample;
+package controller;
 
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.Random;
 
-public class Controller {
+public class AutomationController {
+    @FXML
+    private AnchorPane anchorPane;
     @FXML
     private TextField textFieldRule;
     @FXML
@@ -175,5 +180,11 @@ public class Controller {
             progressBar.setProgress(0f);
         }
         setUserDefinedListener();
+    }
+
+    @FXML
+    public void handleLoadGrainGrowth() throws IOException {
+        AnchorPane pane = FXMLLoader.load(getClass().getResource("../view/grainGrowthView.fxml"));
+        anchorPane.getChildren().setAll(pane);
     }
 }

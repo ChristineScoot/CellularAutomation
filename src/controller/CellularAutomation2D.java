@@ -1,4 +1,4 @@
-package sample;
+package controller;
 
 import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
@@ -103,8 +103,8 @@ public class CellularAutomation2D extends Task {
     }
 
     private double getPointSize() {
-        double pointSizeWidth = 600.0 / width;
-        double pointSizeHeight = 400.0 / height;
+        double pointSizeWidth = gc.getCanvas().getWidth() / width;
+        double pointSizeHeight = gc.getCanvas().getHeight() / height;
         return (pointSizeWidth < pointSizeHeight ? pointSizeWidth : pointSizeHeight);
     }
 
