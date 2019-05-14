@@ -69,7 +69,7 @@ public class AutomationController {
         initializeState[3][5] = true;
         initializeState[4][3] = true;
         initializeState[4][4] = true;
-        cellularAutomation2D = new CellularAutomation2D(canvas.getGraphicsContext2D(), heightInt, widthInt, initializeState);
+        cellularAutomation2D = new CellularAutomation2D(gc, heightInt, widthInt, initializeState);
         setUserDefinedListener();
         thread = new Thread(cellularAutomation2D);
     }
