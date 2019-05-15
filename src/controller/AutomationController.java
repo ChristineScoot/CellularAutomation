@@ -10,7 +10,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.paint.Color;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -141,12 +140,6 @@ public class AutomationController {
     }
 
     private void resetCanvas() {
-        gc.setFill(Color.WHITE);
-        gc.clearRect(canvas.getLayoutX(),
-                canvas.getLayoutY(),
-                canvas.getWidth(),
-                canvas.getHeight());
-
         BufferedImage bi = new BufferedImage((int) canvas.getWidth(), (int) canvas.getHeight(), BufferedImage.TYPE_INT_RGB);
         for (int i = 0; i < (int) canvas.getWidth(); i++) {
             for (int j = 0; j < (int) canvas.getHeight(); j++) {

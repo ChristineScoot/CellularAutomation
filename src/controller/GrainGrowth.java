@@ -20,7 +20,7 @@ public class GrainGrowth extends Task {
     public GrainGrowth(GraphicsContext gc, GrainCell[][] initializeGrainCells, int width, int height) throws CloneNotSupportedException {
         this.gc = gc;
         this.currentGrainCells = initializeGrainCells;
-        this.previousGrainCells = new GrainCell[width][height];
+        this.previousGrainCells = new GrainCell[height][width];
         this.width = width;
         this.height = height;
         printStep(this.currentGrainCells);
@@ -78,7 +78,7 @@ public class GrainGrowth extends Task {
         }
     }
 
-    public void calculate() throws InterruptedException, CloneNotSupportedException {
+    private void calculate() throws InterruptedException, CloneNotSupportedException {
         boolean grew = true;
         while (grew) {
             switch (relation) {

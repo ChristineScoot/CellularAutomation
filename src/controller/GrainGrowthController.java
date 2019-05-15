@@ -2,6 +2,7 @@ package controller;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -13,6 +14,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import model.GrainCell;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Random;
@@ -37,12 +39,16 @@ public class GrainGrowthController implements Initializable {
     private ChoiceBox<String> choiceBoxRelation;
     @FXML
     private ToggleGroup toggleGroupBorderConditions;
+    @FXML
+    private TextField textFieldWidth;
+    @FXML
+    private TextField textFieldHeight;
 
-    GrainGrowth grainGrowth;
-    GrainCell[][] initializeGrainCells;
-    GraphicsContext gc;
-    Random generator = new Random();
-    private int netSize = 30;
+    private GrainGrowth grainGrowth;
+    private GrainCell[][] initializeGrainCells;
+    private GraphicsContext gc;
+    private Random generator = new Random();
+    private int width, height;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -52,12 +58,26 @@ public class GrainGrowthController implements Initializable {
         clear();
     }
 
-    public void clear() {
+    private void clear() {
         setUserDefinedListener();
-        initializeGrainCells = new GrainCell[netSize][netSize];
-        for (int i = 0; i < netSize; i++)
-            for (int j = 0; j < netSize; j++)
+        resetCanvas();
+        width = Integer.parseInt(textFieldWidth.getText());
+        height = Integer.parseInt(textFieldHeight.getText());
+        initializeGrainCells = new GrainCell[height][width];
+        for (int i = 0; i < height; i++)
+            for (int j = 0; j < width; j++)
                 initializeGrainCells[i][j] = new GrainCell(false);
+    }
+
+    private void resetCanvas() {
+        BufferedImage bi = new BufferedImage((int) canvas.getWidth(), (int) canvas.getHeight(), BufferedImage.TYPE_INT_RGB);
+        for (int i = 0; i < (int) canvas.getWidth(); i++) {
+            for (int j = 0; j < (int) canvas.getHeight(); j++) {
+                bi.setRGB(i, j, 16777215);
+            }
+        }
+
+        gc.drawImage(SwingFXUtils.toFXImage(bi, null), 0, 0);
     }
 
     private void initializeChoiceBoxRelation() {
@@ -71,13 +91,13 @@ public class GrainGrowthController implements Initializable {
         clear();
         int numberOfRows = Integer.parseInt(textFieldHomogeneousRow.getText());
         int numberOfColumns = Integer.parseInt(textFieldHomogeneousColumn.getText());
-        if (numberOfRows > netSize || numberOfColumns > netSize) {
+        if (numberOfRows > height || numberOfColumns > width) {
             showAlert();
             return;
         }
         int numberOfCells = numberOfColumns * numberOfRows;
-        int rowPositionSize = netSize / numberOfRows;
-        int columnPositionSize = netSize / numberOfColumns;
+        int rowPositionSize = height / numberOfRows;
+        int columnPositionSize = width / numberOfColumns;
 
         int i = 0;
         for (int row = 0; row < numberOfRows; row++) {
@@ -88,7 +108,7 @@ public class GrainGrowthController implements Initializable {
             }
         }
 
-        grainGrowth = new GrainGrowth(gc, initializeGrainCells, netSize, netSize);
+        grainGrowth = new GrainGrowth(gc, initializeGrainCells, width, height);
     }
 
     @FXML
@@ -97,7 +117,7 @@ public class GrainGrowthController implements Initializable {
         int radius = Integer.parseInt(textFieldRadius.getText());
         int numberOfCells = Integer.parseInt(textFieldRandom.getText());
 
-        if (numberOfCells > netSize * netSize) {
+        if (numberOfCells > width * height) {
             showAlert();
             return;
         }
@@ -107,13 +127,13 @@ public class GrainGrowthController implements Initializable {
             boolean isWithinRadius;
             int maxNumberOfIterations = 1000;
             do {
-                row = generator.nextInt(netSize);
-                column = generator.nextInt(netSize);
+                row = generator.nextInt(height);
+                column = generator.nextInt(width);
                 isWithinRadius = false;
                 for (int j = -radius; j <= radius; j++) {
                     for (int k = -radius; k <= radius; k++) {
-                        int rowNeighbour = (row + j + netSize) % netSize;
-                        int columnNeighbour = (column + k + netSize) % netSize;
+                        int rowNeighbour = (row + j + height) % height;
+                        int columnNeighbour = (column + k + width) % width;
                         if (initializeGrainCells[rowNeighbour][columnNeighbour].isState())
                             isWithinRadius = true;
                     }
@@ -130,7 +150,7 @@ public class GrainGrowthController implements Initializable {
             initializeGrainCells[row][column].setColour(colour);
         }
 
-        grainGrowth = new GrainGrowth(gc, initializeGrainCells, netSize, netSize);
+        grainGrowth = new GrainGrowth(gc, initializeGrainCells, width, height);
     }
 
     @FXML
@@ -138,7 +158,7 @@ public class GrainGrowthController implements Initializable {
         clear();
         int numberOfCells = Integer.parseInt(textFieldRandom.getText());
 
-        if (numberOfCells > netSize * netSize) {
+        if (numberOfCells > width * height) {
             showAlert();
             return;
         }
@@ -146,8 +166,8 @@ public class GrainGrowthController implements Initializable {
         for (int i = 0; i < numberOfCells; i++) {
             int row, column;
             do {
-                row = generator.nextInt(netSize);
-                column = generator.nextInt(netSize);
+                row = generator.nextInt(height);
+                column = generator.nextInt(width);
             }
             while (initializeGrainCells[row][column].isState());
             initializeGrainCells[row][column].setState(true);
@@ -155,7 +175,7 @@ public class GrainGrowthController implements Initializable {
             initializeGrainCells[row][column].setColour(colour);
         }
 
-        grainGrowth = new GrainGrowth(gc, initializeGrainCells, netSize, netSize);
+        grainGrowth = new GrainGrowth(gc, initializeGrainCells, width, height);
     }
 
     @FXML
@@ -164,7 +184,7 @@ public class GrainGrowthController implements Initializable {
         anchorPane.getChildren().setAll(pane);
     }
 
-    public void textFieldKeyAction(KeyEvent keyEvent) throws CloneNotSupportedException {
+    public void textFieldRandomKeyAction(KeyEvent keyEvent) throws CloneNotSupportedException {
         if (keyEvent.getCode() == KeyCode.ENTER)
             handleRandomNucleation();
     }
@@ -189,7 +209,7 @@ public class GrainGrowthController implements Initializable {
     @FXML
     private void handleButtonClear() throws CloneNotSupportedException {
         clear();
-        grainGrowth = new GrainGrowth(gc, initializeGrainCells, netSize, netSize);
+        grainGrowth = new GrainGrowth(gc, initializeGrainCells, width, height);
     }
 
     private void setUserDefinedListener() {
@@ -205,8 +225,8 @@ public class GrainGrowthController implements Initializable {
 
     @FXML
     private void handleButtonStart() throws CloneNotSupportedException {
-        RadioButton borderConditions=(RadioButton) toggleGroupBorderConditions.getSelectedToggle();
-        grainGrowth = new GrainGrowth(gc, initializeGrainCells, netSize, netSize);
+        RadioButton borderConditions = (RadioButton) toggleGroupBorderConditions.getSelectedToggle();
+        grainGrowth = new GrainGrowth(gc, initializeGrainCells, width, height);
         grainGrowth.setRelation(choiceBoxRelation.getValue());
         grainGrowth.setBorderCondition(borderConditions.getText());
         ExecutorService executor = Executors.newSingleThreadExecutor();

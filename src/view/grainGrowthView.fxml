@@ -12,8 +12,13 @@
 <AnchorPane fx:id="anchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0" styleClass="anchorpane" stylesheets="@theme.css" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.GrainGrowthController">
 
     <Canvas fx:id="canvas" height="600.0" layoutY="100.0" width="800.0" />
+    <!--SIZE-->
+    <Label layoutX="750.0" layoutY="19.0" text="WIDTH" />
+    <TextField fx:id="textFieldWidth" layoutX="750.0" layoutY="49.0" prefHeight="31.0" prefWidth="65.0" text="30" />
+    <Label layoutX="750.0" layoutY="85.0" text="HEIGHT" />
+    <TextField fx:id="textFieldHeight" layoutX="750.0" layoutY="115.0" prefHeight="31.0" prefWidth="65.0" text="30" />
     <!--RANDOM-->
-    <TextField fx:id="textFieldRandom" layoutX="15.0" layoutY="49.0" onKeyPressed="#textFieldKeyAction" prefHeight="31.0" prefWidth="50.0" text="10" />
+    <TextField fx:id="textFieldRandom" layoutX="15.0" layoutY="49.0" onKeyPressed="#textFieldRandomKeyAction" prefHeight="31.0" prefWidth="50.0" text="10" />
     <Button layoutX="72.0" layoutY="47.0" mnemonicParsing="false" onAction="#handleRandomNucleation" text="Random" />
     <!--RADIUS-->
     <TextField fx:id="textFieldRadius" layoutX="160.0" layoutY="49.0" onKeyPressed="#textFieldRadiusKeyAction" prefHeight="31.0" prefWidth="50.0" text="5" />
