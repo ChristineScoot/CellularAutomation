@@ -4,6 +4,7 @@ import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.canvas.GraphicsContext;
 import model.GrainCell;
+import model.Neighbour;
 
 import java.awt.image.BufferedImage;
 import java.util.Map;
@@ -99,25 +100,13 @@ public class GrainGrowth extends Task {
         for (int row = 0; row < height; row++) {
             for (int column = 0; column < width; column++) {
                 if (!previousGrainCells[row][column].isState()) {
-                    int left, right, top, bottom;
-
-//                    if ("absorbing".equals(borderCondition)) {
-//                        left = (column - 1 < 0) ? column : column - 1;
-//                        right = (column + 1 > width) ? width : column + 1;
-//                        top = (row - 1 < 0) ? row : row - 1;
-//                        bottom = (row + 1 > height) ? height : row + 1;
-//                    } else {
-                        left = (column - 1 + width) % width;
-                        right = (column + 1 + width) % width;
-                        top = (row - 1 + height) % height;
-                        bottom = (row + 1 + height) % height;
-//                    }
+                    Neighbour neighbour = new Neighbour(row, column, borderCondition, width, height);
                     Map<Integer, Integer> numberOfNeighbours = new TreeMap<>();
 
-                    checkNeighbour(row, left, numberOfNeighbours);
-                    checkNeighbour(row, right, numberOfNeighbours);
-                    checkNeighbour(top, column, numberOfNeighbours);
-                    checkNeighbour(bottom, column, numberOfNeighbours);
+                    checkNeighbour(row, neighbour.getLeft(), numberOfNeighbours);
+                    checkNeighbour(row, neighbour.getRight(), numberOfNeighbours);
+                    checkNeighbour(neighbour.getTop(), column, numberOfNeighbours);
+                    checkNeighbour(neighbour.getBottom(), column, numberOfNeighbours);
 
                     if (numberOfNeighbours.size() > 0) {
                         grew = setNewCell(row, column, numberOfNeighbours);
@@ -130,32 +119,25 @@ public class GrainGrowth extends Task {
 
     private boolean calculateMoore() {
         boolean grew = false;
-        for (int row = 0; row < height; row++) {
-            for (int column = 0; column < width; column++) {
+        for (int row = 0; row < height; row++)
+            for (int column = 0; column < width; column++)
                 if (!previousGrainCells[row][column].isState()) {
-                    int left, right, top, bottom;
-                    left = (column - 1 + width) % width;
-                    right = (column + 1 + width) % width;
-                    top = (row - 1 + height) % height;
-                    bottom = (row + 1 + height) % height;
-
+                    Neighbour neighbour = new Neighbour(row, column, borderCondition, width, height);
                     Map<Integer, Integer> numberOfNeighbours = new TreeMap<>();
-                    checkNeighbour(top, left, numberOfNeighbours);
-                    checkNeighbour(top, column, numberOfNeighbours);
-                    checkNeighbour(top, right, numberOfNeighbours);
+                    checkNeighbour(neighbour.getTop(), neighbour.getLeft(), numberOfNeighbours);
+                    checkNeighbour(neighbour.getTop(), column, numberOfNeighbours);
+                    checkNeighbour(neighbour.getTop(), neighbour.getRight(), numberOfNeighbours);
 
-                    checkNeighbour(row, left, numberOfNeighbours);
-                    checkNeighbour(row, right, numberOfNeighbours);
+                    checkNeighbour(row, neighbour.getLeft(), numberOfNeighbours);
+                    checkNeighbour(row, neighbour.getRight(), numberOfNeighbours);
 
-                    checkNeighbour(bottom, left, numberOfNeighbours);
-                    checkNeighbour(bottom, column, numberOfNeighbours);
-                    checkNeighbour(bottom, right, numberOfNeighbours);
+                    checkNeighbour(neighbour.getBottom(), neighbour.getLeft(), numberOfNeighbours);
+                    checkNeighbour(neighbour.getBottom(), column, numberOfNeighbours);
+                    checkNeighbour(neighbour.getBottom(), neighbour.getRight(), numberOfNeighbours);
                     if (numberOfNeighbours.size() > 0) {
                         grew = setNewCell(row, column, numberOfNeighbours);
                     }
                 }
-            }
-        }
         return grew;
     }
 
