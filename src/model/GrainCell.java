@@ -1,6 +1,6 @@
 package model;
 
-public class GrainCell {
+public class GrainCell implements Cloneable {
     private int colour;
     private boolean state;
 
@@ -22,5 +22,10 @@ public class GrainCell {
 
     public int getColour() {
         return colour;
+    }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
     }
 }

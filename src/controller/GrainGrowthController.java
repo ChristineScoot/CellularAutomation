@@ -1,20 +1,31 @@
 package controller;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.paint.Color;
 import model.GrainCell;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.net.URL;
 import java.util.Random;
+import java.util.ResourceBundle;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-public class GrainGrowthController {
+public class GrainGrowthController{//} implements Initializable {
     @FXML
     private Canvas canvas;
     @FXML
@@ -27,6 +38,8 @@ public class GrainGrowthController {
     private TextField textFieldHomogeneousColumn;
     @FXML
     private TextField textFieldRadius;
+    @FXML
+    private ChoiceBox choiceBoxRelation;
 
     GrainGrowth grainGrowth;
     GrainCell[][] initializeGrainCells;
@@ -34,17 +47,26 @@ public class GrainGrowthController {
     Random generator = new Random();
     private int netSize = 30;
 
-    private void initialize() {
+
+    //@Override
+    public void initialize(){//URL location, ResourceBundle resources) {
         setUserDefinedListener();
-        gc = canvas.getGraphicsContext2D();
+        initializeChoiceBoxRelation();
+        gc=canvas.getGraphicsContext2D();
         initializeGrainCells = new GrainCell[netSize][netSize];
         for (int i = 0; i < netSize; i++)
             for (int j = 0; j < netSize; j++)
                 initializeGrainCells[i][j] = new GrainCell(false);
     }
 
+    private void initializeChoiceBoxRelation() {
+        ObservableList relations = FXCollections.observableArrayList("von Neumann", "Moore", "hex", "pent");
+        choiceBoxRelation.getItems().setAll(relations);
+        choiceBoxRelation.getSelectionModel().selectFirst();
+    }
+
     @FXML
-    private void handleHomogeneousNucleation() {
+    private void handleHomogeneousNucleation() throws CloneNotSupportedException {
         initialize();
         int numberOfRows = Integer.parseInt(textFieldHomogeneousRow.getText());
         int numberOfColumns = Integer.parseInt(textFieldHomogeneousColumn.getText());
@@ -69,7 +91,7 @@ public class GrainGrowthController {
     }
 
     @FXML
-    private void handleRadiusNucleation() {
+    private void handleRadiusNucleation() throws CloneNotSupportedException {
         initialize();
         int radius = Integer.parseInt(textFieldRadius.getText());
         int numberOfCells = Integer.parseInt(textFieldRandom.getText());
@@ -111,7 +133,7 @@ public class GrainGrowthController {
     }
 
     @FXML
-    private void handleRandomNucleation() {
+    private void handleRandomNucleation() throws CloneNotSupportedException {
         initialize();
         int numberOfCells = Integer.parseInt(textFieldRandom.getText());
 
@@ -136,28 +158,22 @@ public class GrainGrowthController {
     }
 
     @FXML
-    private void handleButtonUserDefined() {
-        initialize();
-        grainGrowth = new GrainGrowth(gc, initializeGrainCells, netSize, netSize);
-    }
-
-    @FXML
     private void handleCellularAutomation() throws IOException {
         AnchorPane pane = FXMLLoader.load(getClass().getResource("../view/automationView.fxml"));
         anchorPane.getChildren().setAll(pane);
     }
 
-    public void textFieldKeyAction(KeyEvent keyEvent) {
+    public void textFieldKeyAction(KeyEvent keyEvent) throws CloneNotSupportedException {
         if (keyEvent.getCode() == KeyCode.ENTER)
             handleRandomNucleation();
     }
 
-    public void textFieldRadiusKeyAction(KeyEvent keyEvent) {
+    public void textFieldRadiusKeyAction(KeyEvent keyEvent) throws CloneNotSupportedException {
         if (keyEvent.getCode() == KeyCode.ENTER)
             handleRadiusNucleation();
     }
 
-    public void textFieldHomogeneousKeyAction(KeyEvent keyEvent) {
+    public void textFieldHomogeneousKeyAction(KeyEvent keyEvent) throws CloneNotSupportedException {
         if (keyEvent.getCode() == KeyCode.ENTER)
             handleHomogeneousNucleation();
     }
@@ -170,7 +186,7 @@ public class GrainGrowthController {
     }
 
     @FXML
-    private void handleButtonClear() {
+    private void handleButtonClear() throws CloneNotSupportedException {
         initialize();
         grainGrowth = new GrainGrowth(gc, initializeGrainCells, netSize, netSize);
     }
@@ -178,12 +194,19 @@ public class GrainGrowthController {
     private void setUserDefinedListener() {
         canvas.setOnMouseClicked(event -> {
             int x = (int) event.getX(), y = (int) event.getY();
-            grainGrowth.setCell(x, y);
+            try {
+                grainGrowth.setCell(x, y);
+            } catch (CloneNotSupportedException e) {
+                e.printStackTrace();
+            }
         });
     }
 
     @FXML
-    private void handleButtonStart() {
-
+    private void handleButtonStart() throws CloneNotSupportedException {
+        choiceBoxRelation.getValue();
+        grainGrowth = new GrainGrowth(gc, initializeGrainCells, netSize, netSize);
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.submit(grainGrowth);
     }
 }
