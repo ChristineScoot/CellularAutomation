@@ -14,6 +14,7 @@ public class GrainGrowth extends Task {
     private GraphicsContext gc;
     private GrainCell[][] previousGrainCells, currentGrainCells;
     private int width, height;
+    private String relation, borderCondition;
 
     public GrainGrowth(GraphicsContext gc, GrainCell[][] initializeGrainCells, int width, int height) throws CloneNotSupportedException {
         this.gc = gc;
@@ -79,14 +80,55 @@ public class GrainGrowth extends Task {
     public void calculate() throws InterruptedException, CloneNotSupportedException {
         boolean grew = true;
         while (grew) {
-            grew = calculateSingleStep();
+            switch (relation) {
+                case "von Neumann":
+                    grew = calculateVonNeumann();
+                    break;
+                case "Moore":
+                    grew = calculateMoore();
+                    break;
+            }
             updatePreviousGeneration();
             Thread.sleep(50);
             printStep(previousGrainCells);
         }
     }
 
-    private boolean calculateSingleStep() {
+    private boolean calculateVonNeumann() {
+        boolean grew = false;
+        for (int row = 0; row < height; row++) {
+            for (int column = 0; column < width; column++) {
+                if (!previousGrainCells[row][column].isState()) {
+                    int left, right, top, bottom;
+
+//                    if ("absorbing".equals(borderCondition)) {
+//                        left = (column - 1 < 0) ? column : column - 1;
+//                        right = (column + 1 > width) ? width : column + 1;
+//                        top = (row - 1 < 0) ? row : row - 1;
+//                        bottom = (row + 1 > height) ? height : row + 1;
+//                    } else {
+                        left = (column - 1 + width) % width;
+                        right = (column + 1 + width) % width;
+                        top = (row - 1 + height) % height;
+                        bottom = (row + 1 + height) % height;
+//                    }
+                    Map<Integer, Integer> numberOfNeighbours = new TreeMap<>();
+
+                    checkNeighbour(row, left, numberOfNeighbours);
+                    checkNeighbour(row, right, numberOfNeighbours);
+                    checkNeighbour(top, column, numberOfNeighbours);
+                    checkNeighbour(bottom, column, numberOfNeighbours);
+
+                    if (numberOfNeighbours.size() > 0) {
+                        grew = setNewCell(row, column, numberOfNeighbours);
+                    }
+                }
+            }
+        }
+        return grew;
+    }
+
+    private boolean calculateMoore() {
         boolean grew = false;
         for (int row = 0; row < height; row++) {
             for (int column = 0; column < width; column++) {
@@ -98,24 +140,34 @@ public class GrainGrowth extends Task {
                     bottom = (row + 1 + height) % height;
 
                     Map<Integer, Integer> numberOfNeighbours = new TreeMap<>();
-                    if (previousGrainCells[row][left].isState())
-                        getNeighboursValues(row, left, numberOfNeighbours);
-                    if (previousGrainCells[row][right].isState())
-                        getNeighboursValues(row, right, numberOfNeighbours);
-                    if (previousGrainCells[top][column].isState())
-                        getNeighboursValues(top, column, numberOfNeighbours);
-                    if (previousGrainCells[bottom][column].isState())
-                        getNeighboursValues(bottom, column, numberOfNeighbours);
+                    checkNeighbour(top, left, numberOfNeighbours);
+                    checkNeighbour(top, column, numberOfNeighbours);
+                    checkNeighbour(top, right, numberOfNeighbours);
 
+                    checkNeighbour(row, left, numberOfNeighbours);
+                    checkNeighbour(row, right, numberOfNeighbours);
+
+                    checkNeighbour(bottom, left, numberOfNeighbours);
+                    checkNeighbour(bottom, column, numberOfNeighbours);
+                    checkNeighbour(bottom, right, numberOfNeighbours);
                     if (numberOfNeighbours.size() > 0) {
-                        currentGrainCells[row][column].setState(true);
-                        currentGrainCells[row][column].setColour(findMostCommonNeighbour(numberOfNeighbours));
-                        grew = true;
+                        grew = setNewCell(row, column, numberOfNeighbours);
                     }
                 }
             }
         }
         return grew;
+    }
+
+    private void checkNeighbour(int row, int column, Map<Integer, Integer> numberOfNeighbours) {
+        if (previousGrainCells[row][column].isState())
+            getNeighboursValues(row, column, numberOfNeighbours);
+    }
+
+    private boolean setNewCell(int row, int column, Map<Integer, Integer> numberOfNeighbours) {
+        currentGrainCells[row][column].setState(true);
+        currentGrainCells[row][column].setColour(findMostCommonNeighbour(numberOfNeighbours));
+        return true;
     }
 
     private void getNeighboursValues(int row, int column, Map<Integer, Integer> numberOfNeighbours) {
@@ -139,5 +191,13 @@ public class GrainGrowth extends Task {
         printStep(previousGrainCells);
         calculate();
         return null;
+    }
+
+    public void setRelation(String relation) {
+        this.relation = relation;
+    }
+
+    public void setBorderCondition(String borderCondition) {
+        this.borderCondition = borderCondition;
     }
 }

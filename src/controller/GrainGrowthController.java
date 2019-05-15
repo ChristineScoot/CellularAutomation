@@ -2,22 +2,17 @@ package controller;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.paint.Color;
 import model.GrainCell;
 
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Random;
@@ -25,7 +20,7 @@ import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class GrainGrowthController{//} implements Initializable {
+public class GrainGrowthController implements Initializable {
     @FXML
     private Canvas canvas;
     @FXML
@@ -39,7 +34,9 @@ public class GrainGrowthController{//} implements Initializable {
     @FXML
     private TextField textFieldRadius;
     @FXML
-    private ChoiceBox choiceBoxRelation;
+    private ChoiceBox<String> choiceBoxRelation;
+    @FXML
+    private ToggleGroup toggleGroupBorderConditions;
 
     GrainGrowth grainGrowth;
     GrainCell[][] initializeGrainCells;
@@ -47,12 +44,16 @@ public class GrainGrowthController{//} implements Initializable {
     Random generator = new Random();
     private int netSize = 30;
 
-
-    //@Override
-    public void initialize(){//URL location, ResourceBundle resources) {
-        setUserDefinedListener();
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
         initializeChoiceBoxRelation();
-        gc=canvas.getGraphicsContext2D();
+        toggleGroupBorderConditions.getToggles().get(0).setSelected(true);
+        gc = canvas.getGraphicsContext2D();
+        clear();
+    }
+
+    public void clear() {
+        setUserDefinedListener();
         initializeGrainCells = new GrainCell[netSize][netSize];
         for (int i = 0; i < netSize; i++)
             for (int j = 0; j < netSize; j++)
@@ -67,7 +68,7 @@ public class GrainGrowthController{//} implements Initializable {
 
     @FXML
     private void handleHomogeneousNucleation() throws CloneNotSupportedException {
-        initialize();
+        clear();
         int numberOfRows = Integer.parseInt(textFieldHomogeneousRow.getText());
         int numberOfColumns = Integer.parseInt(textFieldHomogeneousColumn.getText());
         if (numberOfRows > netSize || numberOfColumns > netSize) {
@@ -92,7 +93,7 @@ public class GrainGrowthController{//} implements Initializable {
 
     @FXML
     private void handleRadiusNucleation() throws CloneNotSupportedException {
-        initialize();
+        clear();
         int radius = Integer.parseInt(textFieldRadius.getText());
         int numberOfCells = Integer.parseInt(textFieldRandom.getText());
 
@@ -134,7 +135,7 @@ public class GrainGrowthController{//} implements Initializable {
 
     @FXML
     private void handleRandomNucleation() throws CloneNotSupportedException {
-        initialize();
+        clear();
         int numberOfCells = Integer.parseInt(textFieldRandom.getText());
 
         if (numberOfCells > netSize * netSize) {
@@ -187,7 +188,7 @@ public class GrainGrowthController{//} implements Initializable {
 
     @FXML
     private void handleButtonClear() throws CloneNotSupportedException {
-        initialize();
+        clear();
         grainGrowth = new GrainGrowth(gc, initializeGrainCells, netSize, netSize);
     }
 
@@ -204,9 +205,12 @@ public class GrainGrowthController{//} implements Initializable {
 
     @FXML
     private void handleButtonStart() throws CloneNotSupportedException {
-        choiceBoxRelation.getValue();
+        RadioButton borderConditions=(RadioButton) toggleGroupBorderConditions.getSelectedToggle();
         grainGrowth = new GrainGrowth(gc, initializeGrainCells, netSize, netSize);
+        grainGrowth.setRelation(choiceBoxRelation.getValue());
+        grainGrowth.setBorderCondition(borderConditions.getText());
         ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(grainGrowth);
     }
+
 }
