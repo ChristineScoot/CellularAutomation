@@ -117,7 +117,7 @@ public class GrainGrowthController implements Initializable {
         int radius = Integer.parseInt(textFieldRadius.getText());
         int numberOfCells = Integer.parseInt(textFieldRandom.getText());
 
-        if (numberOfCells > width * height) {
+        if (numberOfCells > width * height || radius>width || radius>height) {
             showAlert();
             return;
         }
