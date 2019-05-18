@@ -63,6 +63,9 @@ public class GrainGrowthController implements Initializable {
         resetCanvas();
         width = Integer.parseInt(textFieldWidth.getText());
         height = Integer.parseInt(textFieldHeight.getText());
+        if (width <= 0 || height <= 0) {
+            showNegativeError();
+        }
         initializeGrainCells = new GrainCell[height][width];
         for (int i = 0; i < height; i++)
             for (int j = 0; j < width; j++)
@@ -81,7 +84,7 @@ public class GrainGrowthController implements Initializable {
     }
 
     private void initializeChoiceBoxRelation() {
-        ObservableList relations = FXCollections.observableArrayList("von Neumann", "Moore", "hex", "pent");
+        ObservableList relations = FXCollections.observableArrayList("von Neumann", "Moore", "pent", "hex", "w/radius");
         choiceBoxRelation.getItems().setAll(relations);
         choiceBoxRelation.getSelectionModel().selectFirst();
     }
@@ -91,6 +94,9 @@ public class GrainGrowthController implements Initializable {
         clear();
         int numberOfRows = Integer.parseInt(textFieldHomogeneousRow.getText());
         int numberOfColumns = Integer.parseInt(textFieldHomogeneousColumn.getText());
+        if (numberOfRows <= 0 || numberOfRows <= 0) {
+            showNegativeError();
+        }
         if (numberOfRows > height || numberOfColumns > width) {
             showAlert();
             return;
@@ -116,8 +122,10 @@ public class GrainGrowthController implements Initializable {
         clear();
         int radius = Integer.parseInt(textFieldRadius.getText());
         int numberOfCells = Integer.parseInt(textFieldRandom.getText());
-
-        if (numberOfCells > width * height || radius>width || radius>height) {
+        if (numberOfCells <= 0 || radius <= 0) {
+            showNegativeError();
+        }
+        if (numberOfCells > width * height || radius > width || radius > height) {
             showAlert();
             return;
         }
@@ -157,7 +165,9 @@ public class GrainGrowthController implements Initializable {
     private void handleRandomNucleation() throws CloneNotSupportedException {
         clear();
         int numberOfCells = Integer.parseInt(textFieldRandom.getText());
-
+        if (numberOfCells <= 0) {
+            showNegativeError();
+        }
         if (numberOfCells > width * height) {
             showAlert();
             return;
@@ -203,6 +213,13 @@ public class GrainGrowthController implements Initializable {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error!");
         alert.setHeaderText("Too many cells");
+        alert.showAndWait();
+    }
+
+    private void showNegativeError() {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error!");
+        alert.setHeaderText("Number must be positive");
         alert.showAndWait();
     }
 

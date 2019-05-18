@@ -16,6 +16,7 @@ public class GrainGrowth extends Task {
     private GrainCell[][] previousGrainCells, currentGrainCells;
     private int width, height;
     private String relation, borderCondition;
+    private Random generator = new Random();
 
     public GrainGrowth(GraphicsContext gc, GrainCell[][] initializeGrainCells, int width, int height) throws CloneNotSupportedException {
         this.gc = gc;
@@ -69,7 +70,6 @@ public class GrainGrowth extends Task {
         if (row < height && column < width) {
             currentGrainCells[row][column].setState(!currentGrainCells[row][column].isState());
             if (currentGrainCells[row][column].isState()) {
-                Random generator = new Random();
                 int colour = generator.nextInt(16777215);
                 currentGrainCells[row][column].setColour(colour);
             }
@@ -88,11 +88,19 @@ public class GrainGrowth extends Task {
                 case "Moore":
                     grew = calculateMoore();
                     break;
+                case "hex":
+                    grew = calculateHex();
+                    break;
+                case "pent":
+                    grew = calculatePent();
+                    break;
             }
             updatePreviousGeneration();
-            Thread.sleep(50);
             printStep(previousGrainCells);
+            Thread.sleep(50);
+
         }
+        Thread.sleep(50);
     }
 
     private boolean calculateVonNeumann() {
@@ -138,6 +146,109 @@ public class GrainGrowth extends Task {
                         grew = setNewCell(row, column, numberOfNeighbours);
                     }
                 }
+        return grew;
+    }
+
+    private boolean calculateHex() {
+        boolean grew = false;
+        for (int row = 0; row < height; row++) {
+            for (int column = 0; column < width; column++) {
+                if (!previousGrainCells[row][column].isState()) {
+                    int hexagonalSide = generator.nextInt(2);
+                    Neighbour neighbour = new Neighbour(row, column, borderCondition, width, height);
+                    Map<Integer, Integer> numberOfNeighbours = new TreeMap<>();
+                    switch (hexagonalSide) {
+                        case 0: //left
+                            checkNeighbour(neighbour.getTop(), column, numberOfNeighbours);
+                            checkNeighbour(neighbour.getTop(), neighbour.getRight(), numberOfNeighbours);
+
+                            checkNeighbour(row, neighbour.getLeft(), numberOfNeighbours);
+                            checkNeighbour(row, neighbour.getRight(), numberOfNeighbours);
+
+                            checkNeighbour(neighbour.getBottom(), neighbour.getLeft(), numberOfNeighbours);
+                            checkNeighbour(neighbour.getBottom(), column, numberOfNeighbours);
+                            if (numberOfNeighbours.size() > 0) {
+                                grew = setNewCell(row, column, numberOfNeighbours);
+                            }
+                            break;
+                        case 1: //right
+                            checkNeighbour(neighbour.getTop(), neighbour.getLeft(), numberOfNeighbours);
+                            checkNeighbour(neighbour.getTop(), column, numberOfNeighbours);
+
+                            checkNeighbour(row, neighbour.getLeft(), numberOfNeighbours);
+                            checkNeighbour(row, neighbour.getRight(), numberOfNeighbours);
+
+                            checkNeighbour(neighbour.getBottom(), column, numberOfNeighbours);
+                            checkNeighbour(neighbour.getBottom(), neighbour.getRight(), numberOfNeighbours);
+                            if (numberOfNeighbours.size() > 0) {
+                                grew = setNewCell(row, column, numberOfNeighbours);
+                            }
+                            break;
+                    }
+                }
+            }}
+            return grew;
+    }
+
+    private boolean calculatePent() {
+        boolean grew = false;
+        for (int row = 0; row < height; row++) {
+            for (int column = 0; column < width; column++) {
+                if (!previousGrainCells[row][column].isState()) {
+                    int pentagonalSide = generator.nextInt(4);
+                    Neighbour neighbour = new Neighbour(row, column, borderCondition, width, height);
+                    Map<Integer, Integer> numberOfNeighbours = new TreeMap<>();
+                    switch (pentagonalSide) {
+                        case 0: //left
+                            checkNeighbour(neighbour.getTop(), neighbour.getLeft(), numberOfNeighbours);
+                            checkNeighbour(neighbour.getTop(), column, numberOfNeighbours);
+                            checkNeighbour(row, neighbour.getLeft(), numberOfNeighbours);
+                            checkNeighbour(neighbour.getBottom(), neighbour.getLeft(), numberOfNeighbours);
+                            checkNeighbour(neighbour.getBottom(), column, numberOfNeighbours);
+
+                            if (numberOfNeighbours.size() > 0) {
+                                grew = setNewCell(row, column, numberOfNeighbours);
+                            }
+                            break;
+                        case 1: //right
+                            checkNeighbour(neighbour.getTop(), column, numberOfNeighbours);
+                            checkNeighbour(neighbour.getTop(), neighbour.getRight(), numberOfNeighbours);
+                            checkNeighbour(row, neighbour.getRight(), numberOfNeighbours);
+                            checkNeighbour(neighbour.getBottom(), column, numberOfNeighbours);
+                            checkNeighbour(neighbour.getBottom(), neighbour.getRight(), numberOfNeighbours);
+
+                            if (numberOfNeighbours.size() > 0) {
+                                grew = setNewCell(row, column, numberOfNeighbours);
+                            }
+                            break;
+                        case 2: //top
+                            checkNeighbour(neighbour.getTop(), neighbour.getLeft(), numberOfNeighbours);
+                            checkNeighbour(neighbour.getTop(), column, numberOfNeighbours);
+                            checkNeighbour(neighbour.getTop(), neighbour.getRight(), numberOfNeighbours);
+
+                            checkNeighbour(row, neighbour.getLeft(), numberOfNeighbours);
+                            checkNeighbour(row, neighbour.getRight(), numberOfNeighbours);
+
+                            if (numberOfNeighbours.size() > 0) {
+                                grew = setNewCell(row, column, numberOfNeighbours);
+                            }
+                            break;
+                        case 3: //bottom
+                            checkNeighbour(row, neighbour.getLeft(), numberOfNeighbours);
+                            checkNeighbour(row, neighbour.getRight(), numberOfNeighbours);
+
+                            checkNeighbour(neighbour.getBottom(), neighbour.getLeft(), numberOfNeighbours);
+                            checkNeighbour(neighbour.getBottom(), column, numberOfNeighbours);
+                            checkNeighbour(neighbour.getBottom(), neighbour.getRight(), numberOfNeighbours);
+
+                            if (numberOfNeighbours.size() > 0) {
+                                grew = setNewCell(row, column, numberOfNeighbours);
+                            }
+                            break;
+                    }
+                }
+            }
+        }
         return grew;
     }
 
