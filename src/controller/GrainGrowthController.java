@@ -43,6 +43,8 @@ public class GrainGrowthController implements Initializable {
     private TextField textFieldWidth;
     @FXML
     private TextField textFieldHeight;
+    @FXML
+    private  TextField textFieldRadiusRelation;
 
     private GrainGrowth grainGrowth;
     private GrainCell[][] initializeGrainCells;
@@ -94,7 +96,7 @@ public class GrainGrowthController implements Initializable {
         clear();
         int numberOfRows = Integer.parseInt(textFieldHomogeneousRow.getText());
         int numberOfColumns = Integer.parseInt(textFieldHomogeneousColumn.getText());
-        if (numberOfRows <= 0 || numberOfRows <= 0) {
+        if (numberOfRows <= 0 || numberOfColumns <= 0) {
             showNegativeError();
         }
         if (numberOfRows > height || numberOfColumns > width) {
@@ -139,8 +141,8 @@ public class GrainGrowthController implements Initializable {
                 column = generator.nextInt(width);
                 isWithinRadius = false;
                 for (int j = -radius; j <= radius; j++) {
+                    int rowNeighbour = (row + j + height) % height;
                     for (int k = -radius; k <= radius; k++) {
-                        int rowNeighbour = (row + j + height) % height;
                         int columnNeighbour = (column + k + width) % width;
                         if (initializeGrainCells[rowNeighbour][columnNeighbour].isState())
                             isWithinRadius = true;
@@ -245,6 +247,7 @@ public class GrainGrowthController implements Initializable {
         RadioButton borderConditions = (RadioButton) toggleGroupBorderConditions.getSelectedToggle();
         grainGrowth = new GrainGrowth(gc, initializeGrainCells, width, height);
         grainGrowth.setRelation(choiceBoxRelation.getValue());
+        grainGrowth.setRelationRadius(Integer.parseInt(textFieldRadiusRelation.getText()));
         grainGrowth.setBorderCondition(borderConditions.getText());
         ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(grainGrowth);
