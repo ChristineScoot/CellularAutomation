@@ -1,6 +1,6 @@
 package model;
 
-public class CentreOfGravityCoordinates {
+public class Coordinates {
     private double x;
     private double y;
 
@@ -12,7 +12,7 @@ public class CentreOfGravityCoordinates {
         return y;
     }
 
-    public CentreOfGravityCoordinates(double x, double y) {
+    public Coordinates(double x, double y) {
         this.x = x;
         this.y = y;
     }

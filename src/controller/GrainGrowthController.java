@@ -44,10 +44,14 @@ public class GrainGrowthController implements Initializable {
     @FXML
     private TextField textFieldHeight;
     @FXML
-    private  TextField textFieldRadiusRelation;
+    private TextField textFieldRadiusRelation;
+    @FXML
+    private TextField textFieldMCkt;
+    @FXML
+    private TextField textFieldMCIterations;
 
     private GrainGrowth grainGrowth;
-    private GrainCell[][] initializeGrainCells;
+    private GrainCell[][] initializeGrainCells, microstructure;
     private GraphicsContext gc;
     private Random generator = new Random();
     private int width, height;
@@ -58,6 +62,7 @@ public class GrainGrowthController implements Initializable {
         toggleGroupBorderConditions.getToggles().get(0).setSelected(true);
         gc = canvas.getGraphicsContext2D();
         clear();
+        microstructure = new GrainCell[height][width];
     }
 
     private void clear() {
@@ -251,6 +256,22 @@ public class GrainGrowthController implements Initializable {
         grainGrowth.setBorderCondition(borderConditions.getText());
         ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(grainGrowth);
+    }
+
+    @FXML
+    private void handleButtonMonteCarlo() {
+        int iterations = Integer.parseInt(textFieldMCIterations.getText());
+        if (iterations <= 0) {
+            showNegativeError();
+        }
+        microstructure = grainGrowth.getCurrentGrainCells();
+        RadioButton borderConditions = (RadioButton) toggleGroupBorderConditions.getSelectedToggle();
+        String borderCond = borderConditions.getText();
+        double kt = Double.parseDouble(textFieldMCkt.getText());
+
+        MonteCarlo monteCarlo = new MonteCarlo(iterations, microstructure, borderCond, gc, kt, choiceBoxRelation.getValue(), Integer.parseInt(textFieldRadiusRelation.getText()));
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.submit(monteCarlo);
     }
 
 }

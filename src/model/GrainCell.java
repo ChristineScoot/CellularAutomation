@@ -3,11 +3,11 @@ package model;
 public class GrainCell implements Cloneable {
     private int colour;
     private boolean state;
-    private CentreOfGravityCoordinates coordinates;
+    private Coordinates coordinates;
 
     public GrainCell(boolean state) {
         this.state = state;
-        coordinates=new CentreOfGravityCoordinates(0,0);
+        coordinates = new Coordinates(0, 0);
     }
 
     public boolean isState() {
@@ -22,7 +22,7 @@ public class GrainCell implements Cloneable {
         this.colour = colour;
     }
 
-    public void setCoordinates(CentreOfGravityCoordinates coordinates) {
+    public void setCoordinates(Coordinates coordinates) {
         this.coordinates = coordinates;
     }
 
@@ -30,7 +30,7 @@ public class GrainCell implements Cloneable {
         return colour;
     }
 
-    public CentreOfGravityCoordinates getCoordinates() {
+    public Coordinates getCoordinates() {
         return coordinates;
     }
 

@@ -9,11 +9,12 @@
 <?import javafx.scene.layout.AnchorPane?>
 
 <?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.control.ProgressBar?>
 <AnchorPane fx:id="anchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0" styleClass="anchorpane" stylesheets="@theme.css" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.GrainGrowthController">
 
     <Canvas fx:id="canvas" height="600.0" layoutY="100.0" width="750.0" />
     <!--RANDOM-->
-    <TextField fx:id="textFieldRandom" layoutX="15.0" layoutY="49.0" onKeyPressed="#textFieldRandomKeyAction" prefHeight="31.0" prefWidth="50.0" text="10" />
+    <TextField fx:id="textFieldRandom" layoutX="15.0" layoutY="49.0" onKeyPressed="#textFieldRandomKeyAction" prefHeight="31.0" prefWidth="50.0" text="100" />
     <Button layoutX="72.0" layoutY="47.0" mnemonicParsing="false" onAction="#handleRandomNucleation" text="Random" />
     <!--RADIUS-->
     <TextField fx:id="textFieldRadius" layoutX="160.0" layoutY="49.0" onKeyPressed="#textFieldRadiusKeyAction" prefHeight="31.0" prefWidth="50.0" text="5" />
@@ -26,18 +27,25 @@
     <Button layoutX="445.0" layoutY="47.0" mnemonicParsing="false" onAction="#handleHomogeneousNucleation" text="Homogeneous" />
     <!--SIZE-->
     <Label layoutX="760.0" layoutY="19.0" text="WIDTH" />
-    <TextField fx:id="textFieldWidth" layoutX="760.0" layoutY="49.0" prefHeight="31.0" prefWidth="65.0" text="50" />
+    <TextField fx:id="textFieldWidth" layoutX="760.0" layoutY="49.0" prefHeight="31.0" prefWidth="65.0" text="100" />
     <Label layoutX="760.0" layoutY="85.0" text="HEIGHT" />
-    <TextField fx:id="textFieldHeight" layoutX="760.0" layoutY="115.0" prefHeight="31.0" prefWidth="65.0" text="50" />
+    <TextField fx:id="textFieldHeight" layoutX="760.0" layoutY="115.0" prefHeight="31.0" prefWidth="65.0" text="100" />
 
     <Label layoutX="577.0" layoutY="19.0" text="Relation" />
     <ChoiceBox fx:id="choiceBoxRelation" layoutX="577.0" layoutY="49.0" prefWidth="150.0" />
     <Label layoutX="855.0" layoutY="170.0" text="Radius relation" />
-    <TextField fx:id="textFieldRadiusRelation" layoutX="855.0" layoutY="190.0" prefHeight="31.0" prefWidth="65.0" text="100" />
+    <TextField fx:id="textFieldRadiusRelation" layoutX="855.0" layoutY="190.0" prefHeight="31.0" prefWidth="65.0" text="15" />
 
     <Button layoutX="850.0" layoutY="10.0" minWidth="120" mnemonicParsing="false" onAction="#handleButtonClear" text="Clear" />
     <Button layoutX="850.0" layoutY="60.0" minWidth="120" mnemonicParsing="false" onAction="#handleButtonStart" text="Start" />
-    <Button layoutX="850.0" layoutY="400.0" minWidth="120" mnemonicParsing="false" onAction="#handleCellularAutomation" text="Back" />
+    <!--MonteCarlo-->
+    <Label layoutX="855.0" layoutY="230.0" text="Iterations" />
+    <TextField fx:id="textFieldMCIterations" layoutX="855.0" layoutY="250.0" prefHeight="31.0" prefWidth="65.0" text="50" />
+    <Label layoutX="855.0" layoutY="280.0" text="kt (0.1, -6)" />
+    <TextField fx:id="textFieldMCkt" layoutX="855.0" layoutY="300.0" prefHeight="31.0" prefWidth="65.0" text="-1" />
+    <Button layoutX="850.0" layoutY="350.0" minWidth="120" mnemonicParsing="false" onAction="#handleButtonMonteCarlo" text="MC" />
+
+    <Button layoutX="850.0" layoutY="500.0" minWidth="120" mnemonicParsing="false" onAction="#handleCellularAutomation" text="Back" />
 
     <RadioButton layoutX="855.0" layoutY="117.0" mnemonicParsing="false" text="absorbing">
         <toggleGroup>

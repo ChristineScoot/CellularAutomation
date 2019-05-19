@@ -19,15 +19,15 @@
     <TextField fx:id="width" layoutX="187.0" layoutY="14.0" onKeyPressed="#textFieldKeyAction" prefHeight="31.0" prefWidth="65.0" text="30" />
     <Label layoutX="259.0" layoutY="19.0" text="HEIGHT" />
     <TextField fx:id="height" layoutX="321.0" layoutY="14.0" onKeyPressed="#textFieldKeyAction" prefHeight="31.0" prefWidth="65.0" text="15" />
-    <Button fx:id="buttonOneD" layoutX="850.0" layoutY="10.0" minWidth="120" mnemonicParsing="false" onAction="#handleButtonOneD" text="Calculate 1D" />
-    <Button fx:id="ButtonFixed" layoutX="850.0" layoutY="60.0" minWidth="120" mnemonicParsing="false" onAction="#handleButtonFixed" text="fixed" />
-    <Button fx:id="buttonGlider" layoutX="850.0" layoutY="110.0" mnemonicParsing="false" onAction="#handleButtonGlider" prefWidth="120" text="glider" />
-    <Button fx:id="buttonUserDefine" layoutX="850.0" layoutY="160.0" minWidth="120" mnemonicParsing="false" onAction="#handleButtonUserDefined" text="user defined" />
-    <Button fx:id="buttonOscillate" layoutX="850.0" layoutY="210.0" minWidth="120" mnemonicParsing="false" onAction="#handleButtonOscillator" text="oscillator" />
-    <Button fx:id="buttonRandom" layoutX="850.0" layoutY="260.0" minWidth="120" mnemonicParsing="false" onAction="#handleButtonRandom" text="random" />
-    <Button fx:id="buttonStart" layoutX="850.0" layoutY="310.0" minWidth="60" mnemonicParsing="false" onAction="#handleStartButtonAction" text="start" />
-    <Button fx:id="buttonStop" layoutX="910.0" layoutY="310.0" minWidth="60" mnemonicParsing="false" onAction="#handleStopButtonAction" text="stop" />
+    <Button layoutX="850.0" layoutY="10.0" minWidth="120" mnemonicParsing="false" onAction="#handleButtonOneD" text="Calculate 1D" />
+    <Button layoutX="850.0" layoutY="60.0" minWidth="120" mnemonicParsing="false" onAction="#handleButtonFixed" text="fixed" />
+    <Button layoutX="850.0" layoutY="110.0" mnemonicParsing="false" onAction="#handleButtonGlider" prefWidth="120" text="glider" />
+    <Button layoutX="850.0" layoutY="160.0" minWidth="120" mnemonicParsing="false" onAction="#handleButtonUserDefined" text="user defined" />
+    <Button layoutX="850.0" layoutY="210.0" minWidth="120" mnemonicParsing="false" onAction="#handleButtonOscillator" text="oscillator" />
+    <Button layoutX="850.0" layoutY="260.0" minWidth="120" mnemonicParsing="false" onAction="#handleButtonRandom" text="random" />
+    <Button layoutX="850.0" layoutY="310.0" minWidth="60" mnemonicParsing="false" onAction="#handleStartButtonAction" text="start" />
+    <Button layoutX="910.0" layoutY="310.0" minWidth="60" mnemonicParsing="false" onAction="#handleStopButtonAction" text="stop" />
     <ProgressBar fx:id="progressBar" layoutX="845.0" layoutY="360.0" prefHeight="23.0" prefWidth="131.0" progress="0.0" />
-    <Button fx:id="buttonGrainGrowth" layoutX="850.0" layoutY="400.0" minWidth="120" mnemonicParsing="false" onAction="#handleLoadGrainGrowth" text="Grain growth" />
+    <Button layoutX="850.0" layoutY="500.0" minWidth="120" mnemonicParsing="false" onAction="#handleLoadGrainGrowth" text="Grain growth" />
 
 </AnchorPane>

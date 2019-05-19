@@ -3,14 +3,13 @@ package controller;
 import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.canvas.GraphicsContext;
-import model.CentreOfGravityCoordinates;
+import model.Coordinates;
 import model.GrainCell;
 import model.Neighbour;
 
 import java.awt.image.BufferedImage;
 import java.util.Map;
 import java.util.Random;
-import java.util.TreeMap;
 
 public class GrainGrowth extends Task {
     private GraphicsContext gc;
@@ -30,7 +29,7 @@ public class GrainGrowth extends Task {
         initializeCentreOfGravity();
     }
 
-    private void printStep(GrainCell[][] step) {
+    public void printStep(GrainCell[][] step) {
         double pointSize = getPointSize();
         BufferedImage bi = new BufferedImage((int) (width * pointSize), (int) (height * pointSize), BufferedImage.TYPE_INT_RGB);
         double canvasX;
@@ -42,7 +41,7 @@ public class GrainGrowth extends Task {
                     for (int k = 0; k < pointSize; k++)
                         for (int l = 0; l < pointSize; l++) {
                             bi.setRGB((int) canvasX + k, (int) canvasY + l, step[i][j].getColour());
-                            bi.setRGB((int) step[i][j].getCoordinates().getX(), (int) step[i][j].getCoordinates().getY(), 16711680);
+//                            bi.setRGB((int) step[i][j].getCoordinates().getX(), (int) step[i][j].getCoordinates().getY(), 16711680);
                         }
                 else
                     for (int k = 0; k < pointSize; k++)
@@ -111,21 +110,13 @@ public class GrainGrowth extends Task {
     private boolean calculateVonNeumann() {
         boolean grew = false;
         for (int row = 0; row < height; row++)
-            for (int column = 0; column < width; column++) {
+            for (int column = 0; column < width; column++)
                 if (!previousGrainCells[row][column].isState()) {
-                    Neighbour neighbour = new Neighbour(row, column, borderCondition, width, height);
-                    Map<Integer, Integer> numberOfNeighbours = new TreeMap<>();
-
-                    checkNeighbour(row, neighbour.getLeft(), numberOfNeighbours);
-                    checkNeighbour(row, neighbour.getRight(), numberOfNeighbours);
-                    checkNeighbour(neighbour.getTop(), column, numberOfNeighbours);
-                    checkNeighbour(neighbour.getBottom(), column, numberOfNeighbours);
-
-                    if (numberOfNeighbours.size() > 0) {
+                    Neighbour neighbour = new Neighbour(row, column, borderCondition, width, height, previousGrainCells);
+                    Map<Integer, Integer> numberOfNeighbours = neighbour.checkVonNeumann();
+                    if (numberOfNeighbours.size() > 0)
                         grew = setNewCell(row, column, numberOfNeighbours);
-                    }
                 }
-            }
         return grew;
     }
 
@@ -134,173 +125,51 @@ public class GrainGrowth extends Task {
         for (int row = 0; row < height; row++)
             for (int column = 0; column < width; column++)
                 if (!previousGrainCells[row][column].isState()) {
-                    Neighbour neighbour = new Neighbour(row, column, borderCondition, width, height);
-                    Map<Integer, Integer> numberOfNeighbours = new TreeMap<>();
-                    checkNeighbour(neighbour.getTop(), neighbour.getLeft(), numberOfNeighbours);
-                    checkNeighbour(neighbour.getTop(), column, numberOfNeighbours);
-                    checkNeighbour(neighbour.getTop(), neighbour.getRight(), numberOfNeighbours);
-
-                    checkNeighbour(row, neighbour.getLeft(), numberOfNeighbours);
-                    checkNeighbour(row, neighbour.getRight(), numberOfNeighbours);
-
-                    checkNeighbour(neighbour.getBottom(), neighbour.getLeft(), numberOfNeighbours);
-                    checkNeighbour(neighbour.getBottom(), column, numberOfNeighbours);
-                    checkNeighbour(neighbour.getBottom(), neighbour.getRight(), numberOfNeighbours);
-                    if (numberOfNeighbours.size() > 0) {
+                    Neighbour neighbour = new Neighbour(row, column, borderCondition, width, height, previousGrainCells);
+                    Map<Integer, Integer> numberOfNeighbours = neighbour.checkMoore();
+                    if (numberOfNeighbours.size() > 0)
                         grew = setNewCell(row, column, numberOfNeighbours);
-                    }
                 }
         return grew;
     }
 
     private boolean calculateHex() {
         boolean grew = false;
-        for (int row = 0; row < height; row++) {
-            for (int column = 0; column < width; column++) {
+        for (int row = 0; row < height; row++)
+            for (int column = 0; column < width; column++)
                 if (!previousGrainCells[row][column].isState()) {
-                    int hexagonalSide = generator.nextInt(2);
-                    Neighbour neighbour = new Neighbour(row, column, borderCondition, width, height);
-                    Map<Integer, Integer> numberOfNeighbours = new TreeMap<>();
-                    switch (hexagonalSide) {
-                        case 0: //left
-                            checkNeighbour(neighbour.getTop(), column, numberOfNeighbours);
-                            checkNeighbour(neighbour.getTop(), neighbour.getRight(), numberOfNeighbours);
-
-                            checkNeighbour(row, neighbour.getLeft(), numberOfNeighbours);
-                            checkNeighbour(row, neighbour.getRight(), numberOfNeighbours);
-
-                            checkNeighbour(neighbour.getBottom(), neighbour.getLeft(), numberOfNeighbours);
-                            checkNeighbour(neighbour.getBottom(), column, numberOfNeighbours);
-                            if (numberOfNeighbours.size() > 0) {
-                                grew = setNewCell(row, column, numberOfNeighbours);
-                            }
-                            break;
-                        case 1: //right
-                            checkNeighbour(neighbour.getTop(), neighbour.getLeft(), numberOfNeighbours);
-                            checkNeighbour(neighbour.getTop(), column, numberOfNeighbours);
-
-                            checkNeighbour(row, neighbour.getLeft(), numberOfNeighbours);
-                            checkNeighbour(row, neighbour.getRight(), numberOfNeighbours);
-
-                            checkNeighbour(neighbour.getBottom(), column, numberOfNeighbours);
-                            checkNeighbour(neighbour.getBottom(), neighbour.getRight(), numberOfNeighbours);
-                            if (numberOfNeighbours.size() > 0) {
-                                grew = setNewCell(row, column, numberOfNeighbours);
-                            }
-                            break;
-                    }
+                    Neighbour neighbour = new Neighbour(row, column, borderCondition, width, height, previousGrainCells);
+                    Map<Integer, Integer> numberOfNeighbours = neighbour.checkHex();
+                    if (numberOfNeighbours.size() > 0)
+                        grew = setNewCell(row, column, numberOfNeighbours);
                 }
-            }
-        }
         return grew;
     }
 
     private boolean calculatePent() {
         boolean grew = false;
-        for (int row = 0; row < height; row++) {
-            for (int column = 0; column < width; column++) {
+        for (int row = 0; row < height; row++)
+            for (int column = 0; column < width; column++)
                 if (!previousGrainCells[row][column].isState()) {
-                    int pentagonalSide = generator.nextInt(4);
-                    Neighbour neighbour = new Neighbour(row, column, borderCondition, width, height);
-                    Map<Integer, Integer> numberOfNeighbours = new TreeMap<>();
-                    switch (pentagonalSide) {
-                        case 0: //left
-                            checkNeighbour(neighbour.getTop(), neighbour.getLeft(), numberOfNeighbours);
-                            checkNeighbour(neighbour.getTop(), column, numberOfNeighbours);
-                            checkNeighbour(row, neighbour.getLeft(), numberOfNeighbours);
-                            checkNeighbour(neighbour.getBottom(), neighbour.getLeft(), numberOfNeighbours);
-                            checkNeighbour(neighbour.getBottom(), column, numberOfNeighbours);
-
-                            if (numberOfNeighbours.size() > 0) {
-                                grew = setNewCell(row, column, numberOfNeighbours);
-                            }
-                            break;
-                        case 1: //right
-                            checkNeighbour(neighbour.getTop(), column, numberOfNeighbours);
-                            checkNeighbour(neighbour.getTop(), neighbour.getRight(), numberOfNeighbours);
-                            checkNeighbour(row, neighbour.getRight(), numberOfNeighbours);
-                            checkNeighbour(neighbour.getBottom(), column, numberOfNeighbours);
-                            checkNeighbour(neighbour.getBottom(), neighbour.getRight(), numberOfNeighbours);
-
-                            if (numberOfNeighbours.size() > 0) {
-                                grew = setNewCell(row, column, numberOfNeighbours);
-                            }
-                            break;
-                        case 2: //top
-                            checkNeighbour(neighbour.getTop(), neighbour.getLeft(), numberOfNeighbours);
-                            checkNeighbour(neighbour.getTop(), column, numberOfNeighbours);
-                            checkNeighbour(neighbour.getTop(), neighbour.getRight(), numberOfNeighbours);
-
-                            checkNeighbour(row, neighbour.getLeft(), numberOfNeighbours);
-                            checkNeighbour(row, neighbour.getRight(), numberOfNeighbours);
-
-                            if (numberOfNeighbours.size() > 0) {
-                                grew = setNewCell(row, column, numberOfNeighbours);
-                            }
-                            break;
-                        case 3: //bottom
-                            checkNeighbour(row, neighbour.getLeft(), numberOfNeighbours);
-                            checkNeighbour(row, neighbour.getRight(), numberOfNeighbours);
-
-                            checkNeighbour(neighbour.getBottom(), neighbour.getLeft(), numberOfNeighbours);
-                            checkNeighbour(neighbour.getBottom(), column, numberOfNeighbours);
-                            checkNeighbour(neighbour.getBottom(), neighbour.getRight(), numberOfNeighbours);
-
-                            if (numberOfNeighbours.size() > 0) {
-                                grew = setNewCell(row, column, numberOfNeighbours);
-                            }
-                            break;
-                    }
+                    Neighbour neighbour = new Neighbour(row, column, borderCondition, width, height, previousGrainCells);
+                    Map<Integer, Integer> numberOfNeighbours = neighbour.checkPent();
+                    if (numberOfNeighbours.size() > 0)
+                        grew = setNewCell(row, column, numberOfNeighbours);
                 }
-            }
-        }
         return grew;
     }
 
     private boolean calculateWithRadius() {
         boolean grew = false;
-        double maxX, minX, maxY, minY;
         for (int row = 0; row < height; row++)
             for (int column = 0; column < width; column++)
                 if (!previousGrainCells[row][column].isState()) {
-                    Map<Integer, Integer> numberOfNeighbours = new TreeMap<>();
-                    for (int neighRow = 0; neighRow < height; neighRow++)
-                        for (int neighColumn = 0; neighColumn < width; neighColumn++) {
-                            if (previousGrainCells[neighRow][neighColumn].isState()) {
-                                maxX = previousGrainCells[neighRow][neighColumn].getCoordinates().getX();
-                                minX = previousGrainCells[row][column].getCoordinates().getX();
-                                maxY = previousGrainCells[neighRow][neighColumn].getCoordinates().getY();
-                                minY = previousGrainCells[row][column].getCoordinates().getY();
-                                double distance = Math.sqrt(Math.pow(maxX - minX, 2) +
-                                        Math.pow(maxY - minY, 2));
-                                if (distance <= relationRadius)
-                                    getNeighboursValues(neighRow, neighColumn, numberOfNeighbours);
-                                else if ("periodical".equals(borderCondition)) {
-                                    double maxXAbsorb = maxX > minX ? maxX - width * getPointSize() : maxX;
-                                    double minXAbsorb = minX > maxX ? minX - width * getPointSize() : minX;
-                                    double maxYAbsorb = maxY > minY ? maxY - height * getPointSize() : maxY;
-                                    double minYAbsorb = minY > maxY ? minY - height * getPointSize() : minY;
-                                    double distanceX = Math.sqrt(Math.pow(maxX - minX, 2) +
-                                            Math.pow(maxYAbsorb - minYAbsorb, 2));
-                                    double distanceY = Math.sqrt(Math.pow(maxXAbsorb - minXAbsorb, 2) +
-                                            Math.pow(maxY - minY, 2));
-                                    double distanceXY = Math.sqrt(Math.pow(maxXAbsorb - minXAbsorb, 2) +
-                                            Math.pow(maxYAbsorb - minYAbsorb, 2));
-                                    if (distanceX <= relationRadius || distanceY <= relationRadius || distanceXY <= relationRadius)
-                                        getNeighboursValues(neighRow, neighColumn, numberOfNeighbours);
-                                }
-                            }
-                        }
-                    if (numberOfNeighbours.size() > 0) {
+                    Neighbour neighbour = new Neighbour(row, column, borderCondition, width, height, previousGrainCells);
+                    Map<Integer, Integer> numberOfNeighbours = neighbour.checkWithRadius(relationRadius, getPointSize());
+                    if (numberOfNeighbours.size() > 0)
                         grew = setNewCell(row, column, numberOfNeighbours);
-                    }
                 }
         return grew;
-    }
-
-    private void checkNeighbour(int row, int column, Map<Integer, Integer> numberOfNeighbours) {
-        if (previousGrainCells[row][column].isState())
-            getNeighboursValues(row, column, numberOfNeighbours);
     }
 
     private boolean setNewCell(int row, int column, Map<Integer, Integer> numberOfNeighbours) {
@@ -318,15 +187,8 @@ public class GrainGrowth extends Task {
                 double yBottom = ((row + 1) * getPointSize()) - 1;
                 double x = xLeft + (xRight - xLeft) * generator.nextDouble();
                 double y = yTop + (yBottom - yTop) * generator.nextDouble();
-                currentGrainCells[row][column].setCoordinates(new CentreOfGravityCoordinates(x, y));
+                currentGrainCells[row][column].setCoordinates(new Coordinates(x, y));
             }
-    }
-
-    private void getNeighboursValues(int row, int column, Map<Integer, Integer> numberOfNeighbours) {
-        int numberTmp = 1;
-        int colour = previousGrainCells[row][column].getColour();
-        if (numberOfNeighbours.containsKey(colour)) numberTmp = numberOfNeighbours.get(colour) + 1;
-        numberOfNeighbours.put(colour, numberTmp);
     }
 
     private int findMostCommonNeighbour(Map<Integer, Integer> numberOfNeighbours) {
@@ -338,11 +200,11 @@ public class GrainGrowth extends Task {
     }
 
     @Override
-    protected Object call() throws Exception {
+    protected GrainCell[][] call() throws Exception {
         updatePreviousGeneration();
         printStep(previousGrainCells);
         calculate();
-        return null;
+        return currentGrainCells;
     }
 
     public void setRelation(String relation) {
@@ -355,5 +217,9 @@ public class GrainGrowth extends Task {
 
     public void setRelationRadius(int relationRadius) {
         this.relationRadius = relationRadius;
+    }
+
+    public GrainCell[][] getCurrentGrainCells() {
+        return currentGrainCells;
     }
 }
