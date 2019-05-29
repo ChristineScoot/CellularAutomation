@@ -86,15 +86,19 @@ public class GrainGrowth extends Task {
         while (grew) {
             switch (relation) {
                 case "von Neumann":
+                    Thread.sleep(50);
                     grew = calculateVonNeumann();
                     break;
                 case "Moore":
+                    Thread.sleep(50);
                     grew = calculateMoore();
                     break;
                 case "hex":
+                    Thread.sleep(50);
                     grew = calculateHex();
                     break;
                 case "pent":
+                    Thread.sleep(50);
                     grew = calculatePent();
                     break;
                 case "w/radius":
@@ -103,7 +107,6 @@ public class GrainGrowth extends Task {
             }
             updatePreviousGeneration();
             printStep(previousGrainCells);
-            Thread.sleep(50);
         }
     }
 

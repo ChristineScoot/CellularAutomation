@@ -274,4 +274,8 @@ public class GrainGrowthController implements Initializable {
         executor.submit(monteCarlo);
     }
 
+    public void textFieldMCKeyAction(KeyEvent keyEvent) {
+        if (keyEvent.getCode() == KeyCode.ENTER)
+            handleButtonMonteCarlo();
+    }
 }

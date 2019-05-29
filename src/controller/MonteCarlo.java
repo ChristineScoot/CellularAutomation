@@ -79,9 +79,9 @@ public class MonteCarlo extends Task {
                         microstructure[(int) index.getX()][(int) index.getY()].setColour(randomColour);
                     } else { //TODO Is it ok?
                         double probability = Math.exp(-energyDifference / kt);
-                        probability = 1.0 / probability;
-                        double randomProbability = generator.nextDouble();
-                        if (probability > randomProbability)
+                        probability = probability*100;
+                        double randomProbability = generator.nextInt(100);
+                        if (probability < randomProbability)
                             microstructure[(int) index.getX()][(int) index.getY()].setColour(randomColour);
                     }
                 }
