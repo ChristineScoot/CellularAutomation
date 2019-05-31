@@ -17,11 +17,12 @@ public class MonteCarlo extends Task {
     private GraphicsContext gc;
     private double kt;
     private double relationRadius;
+    private String colourIndicator;
 
     private int width, height;
     private Random generator = new Random();
 
-    public MonteCarlo(int iterations, GrainCell[][] microstructure, String borderConditions, GraphicsContext gc, double kt, String relation, int relationRadius) {
+    public MonteCarlo(int iterations, GrainCell[][] microstructure, String borderConditions, GraphicsContext gc, double kt, String relation, int relationRadius, String colourIndicator) {
         this.iterations = iterations;
         this.microstructure = microstructure;
         this.borderConditions = borderConditions;
@@ -29,6 +30,7 @@ public class MonteCarlo extends Task {
         this.kt = kt;
         this.relation = relation;
         this.relationRadius = relationRadius;
+        this.colourIndicator = colourIndicator;
     }
 
     @Override
@@ -43,7 +45,7 @@ public class MonteCarlo extends Task {
         for (int iter = 0; iter < iterations; iter++) {
             List listOfIndexes = initializeList();
             for (int i = 1; i < listOfIndexes.size(); ) {
-                int nr = generator.nextInt(listOfIndexes.size() - 1);
+                int nr = generator.nextInt(listOfIndexes.size());
                 Coordinates index = (Coordinates) listOfIndexes.remove(nr);
                 GrainCell grainCell = microstructure[(int) index.getX()][(int) index.getY()];
                 Neighbour neighbours = new Neighbour((int) index.getX(), (int) index.getY(), borderConditions, width, height, microstructure);
@@ -57,10 +59,10 @@ public class MonteCarlo extends Task {
                             sum += entry.getValue();
                     }
                     int energyBefore = J * sum;
+                    grainCell.setEnergy(energyBefore);
                     int randomColourIndex = generator.nextInt(numberOfNeighbours.size());
                     int randomColour = 0;
 
-                    //FIXME probably stupid solution
                     int counter = 0;
                     for (Map.Entry<Integer, Integer> entry : numberOfNeighbours.entrySet()) {
                         randomColour = entry.getKey();
@@ -140,8 +142,12 @@ public class MonteCarlo extends Task {
             for (int j = 0; j < width; j++) {
                 if (step[i][j].isState())
                     for (int k = 0; k < pointSize; k++)
-                        for (int l = 0; l < pointSize; l++)
-                            bi.setRGB((int) canvasX + k, (int) canvasY + l, step[i][j].getColour());
+                        for (int l = 0; l < pointSize; l++) {
+                            if (colourIndicator.equals("energyColour"))
+                                bi.setRGB((int) canvasX + k, (int) canvasY + l, step[i][j].getEnergyColour());
+                            else
+                                bi.setRGB((int) canvasX + k, (int) canvasY + l, step[i][j].getColour());
+                        }
                 else
                     for (int k = 0; k < pointSize; k++)
                         for (int l = 0; l < pointSize; l++)
@@ -157,5 +163,13 @@ public class MonteCarlo extends Task {
         double pointSizeWidth = gc.getCanvas().getWidth() / width;
         double pointSizeHeight = gc.getCanvas().getHeight() / height;
         return (pointSizeWidth < pointSizeHeight ? pointSizeWidth : pointSizeHeight);
+    }
+
+    public String getColourIndicator() {
+        return colourIndicator;
+    }
+
+    public void setColourIndicator(String colourIndicator) {
+        this.colourIndicator = colourIndicator;
     }
 }

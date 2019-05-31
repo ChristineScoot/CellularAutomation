@@ -51,6 +51,7 @@ public class GrainGrowthController implements Initializable {
     private TextField textFieldMCIterations;
 
     private GrainGrowth grainGrowth;
+    private MonteCarlo monteCarlo;
     private GrainCell[][] initializeGrainCells, microstructure;
     private GraphicsContext gc;
     private Random generator = new Random();
@@ -269,9 +270,17 @@ public class GrainGrowthController implements Initializable {
         String borderCond = borderConditions.getText();
         double kt = Double.parseDouble(textFieldMCkt.getText());
 
-        MonteCarlo monteCarlo = new MonteCarlo(iterations, microstructure, borderCond, gc, kt, choiceBoxRelation.getValue(), Integer.parseInt(textFieldRadiusRelation.getText()));
+        monteCarlo = new MonteCarlo(iterations, microstructure, borderCond, gc, kt, choiceBoxRelation.getValue(), Integer.parseInt(textFieldRadiusRelation.getText()), "");
         ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(monteCarlo);
+    }
+
+    @FXML
+    private void handleButtonMonteCarloEnergyColour() {
+        if (monteCarlo.getColourIndicator().equals("energyColour"))
+            monteCarlo.setColourIndicator("");
+        else
+            monteCarlo.setColourIndicator("energyColour");
     }
 
     public void textFieldMCKeyAction(KeyEvent keyEvent) {
