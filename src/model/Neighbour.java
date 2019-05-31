@@ -55,8 +55,9 @@ public class Neighbour {
         return numberOfNeighbours;
     }
 
-    public Map<Integer, Integer> checkHex() {
-        int hexagonalSide = generator.nextInt(2);
+    public Map<Integer, Integer> checkHex(int hexagonalSide) {
+        if (hexagonalSide != 0 && hexagonalSide != 1)
+            hexagonalSide = generator.nextInt(2);
         switch (hexagonalSide) {
             case 0: //left
                 numberOfNeighbours = checkVonNeumann();

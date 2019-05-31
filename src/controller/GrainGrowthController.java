@@ -91,7 +91,7 @@ public class GrainGrowthController implements Initializable {
     }
 
     private void initializeChoiceBoxRelation() {
-        ObservableList relations = FXCollections.observableArrayList("von Neumann", "Moore", "pent", "hex", "w/radius");
+        ObservableList relations = FXCollections.observableArrayList("von Neumann", "Moore", "pent", "hex left", "hex right", "hex random", "w/radius");
         choiceBoxRelation.getItems().setAll(relations);
         choiceBoxRelation.getSelectionModel().selectFirst();
     }

@@ -93,9 +93,17 @@ public class GrainGrowth extends Task {
                     Thread.sleep(50);
                     grew = calculateMoore();
                     break;
-                case "hex":
+                case "hex left":
                     Thread.sleep(50);
-                    grew = calculateHex();
+                    grew = calculateHexLeft();
+                    break;
+                case "hex right":
+                    Thread.sleep(50);
+                    grew = calculateHexRight();
+                    break;
+                case "hex random":
+                    Thread.sleep(50);
+                    grew = calculateHexRandom();
                     break;
                 case "pent":
                     Thread.sleep(50);
@@ -136,13 +144,39 @@ public class GrainGrowth extends Task {
         return grew;
     }
 
-    private boolean calculateHex() {
+    private boolean calculateHexLeft() {
         boolean grew = false;
         for (int row = 0; row < height; row++)
             for (int column = 0; column < width; column++)
                 if (!previousGrainCells[row][column].isState()) {
                     Neighbour neighbour = new Neighbour(row, column, borderCondition, width, height, previousGrainCells);
-                    Map<Integer, Integer> numberOfNeighbours = neighbour.checkHex();
+                    Map<Integer, Integer> numberOfNeighbours = neighbour.checkHex(0);
+                    if (numberOfNeighbours.size() > 0)
+                        grew = setNewCell(row, column, numberOfNeighbours);
+                }
+        return grew;
+    }
+
+    private boolean calculateHexRight() {
+        boolean grew = false;
+        for (int row = 0; row < height; row++)
+            for (int column = 0; column < width; column++)
+                if (!previousGrainCells[row][column].isState()) {
+                    Neighbour neighbour = new Neighbour(row, column, borderCondition, width, height, previousGrainCells);
+                    Map<Integer, Integer> numberOfNeighbours = neighbour.checkHex(1);
+                    if (numberOfNeighbours.size() > 0)
+                        grew = setNewCell(row, column, numberOfNeighbours);
+                }
+        return grew;
+    }
+
+    private boolean calculateHexRandom() {
+        boolean grew = false;
+        for (int row = 0; row < height; row++)
+            for (int column = 0; column < width; column++)
+                if (!previousGrainCells[row][column].isState()) {
+                    Neighbour neighbour = new Neighbour(row, column, borderCondition, width, height, previousGrainCells);
+                    Map<Integer, Integer> numberOfNeighbours = neighbour.checkHex(3);
                     if (numberOfNeighbours.size() > 0)
                         grew = setNewCell(row, column, numberOfNeighbours);
                 }

@@ -64,7 +64,8 @@ public class MonteCarlo extends Task {
                     int counter = 0;
                     for (Map.Entry<Integer, Integer> entry : numberOfNeighbours.entrySet()) {
                         randomColour = entry.getKey();
-                        if (counter <= randomColourIndex) break;
+                        if (counter == randomColourIndex) break;
+                        counter++;
                     }
                     int newSum = 0;
 
@@ -77,11 +78,10 @@ public class MonteCarlo extends Task {
                     int energyDifference = energyAfter - energyBefore;
                     if (energyDifference <= 0) {
                         microstructure[(int) index.getX()][(int) index.getY()].setColour(randomColour);
-                    } else { //TODO Is it ok?
+                    } else {
                         double probability = Math.exp(-energyDifference / kt);
-                        probability = probability*100;
-                        double randomProbability = generator.nextInt(100);
-                        if (probability < randomProbability)
+                        double randomProbability = generator.nextDouble();
+                        if (probability > randomProbability)
                             microstructure[(int) index.getX()][(int) index.getY()].setColour(randomColour);
                     }
                 }
@@ -109,8 +109,14 @@ public class MonteCarlo extends Task {
             case "Moore":
                 numberOfNeighbours = neighbours.checkMoore();
                 break;
-            case "hex":
-                numberOfNeighbours = neighbours.checkHex();
+            case "hex left":
+                numberOfNeighbours = neighbours.checkHex(0);
+                break;
+            case "hex right":
+                numberOfNeighbours = neighbours.checkHex(1);
+                break;
+            case "hex random":
+                numberOfNeighbours = neighbours.checkHex(3);
                 break;
             case "pent":
                 numberOfNeighbours = neighbours.checkPent();
