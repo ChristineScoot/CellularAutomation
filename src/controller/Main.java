@@ -12,7 +12,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("../view/automationView.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("../view/grainGrowthView.fxml"));
         primaryStage.setTitle("Cellular automation");
         primaryStage.setScene(new Scene(root, 1000, 700, Color.WHITE));
         primaryStage.getIcons().add(new Image("file:icons03.png"));
