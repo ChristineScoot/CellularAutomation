@@ -35,6 +35,7 @@ public class Recrystallisation extends Task {
     }
 
     private void calculate() throws IOException {
+        //TODO Make it work faster somehow
         final String recrystallisationData = System.getProperty("user.dir") + "/src/recrystallisation.xls";
 
         Workbook workbook;
@@ -45,16 +46,20 @@ public class Recrystallisation extends Task {
             return;
         }
         Sheet sheet = workbook.getSheetAt(0);
+        workbook.close();
+
         int numberOfRows = sheet.getPhysicalNumberOfRows();
         double time, ro, nextRo, sigma, avgDislocationsInCell, chunk30percent, chunk10percent;
 
         double roCritical = sheet.getRow(69).getCell(1).getNumericCellValue() / (width * height);
         double sumDislocationsDensity = 0;
+        List listOfBorderCells = initializeBorderList();
+        List listOfCenterCells = initializeCenterList();
         for (int i = 4; i < numberOfRows - 1; i++) {
             time = sheet.getRow(i).getCell(0).getNumericCellValue();
             ro = sheet.getRow(i).getCell(1).getNumericCellValue();
             nextRo = sheet.getRow(i + 1).getCell(1).getNumericCellValue();
-            sigma = sheet.getRow(i).getCell(2).getNumericCellValue();
+//            sigma = sheet.getRow(i).getCell(2).getNumericCellValue();
             avgDislocationsInCell = (nextRo - ro) / (width * height);
             chunk30percent = avgDislocationsInCell * 0.3;
             chunk10percent = avgDislocationsInCell * 0.1;
@@ -68,15 +73,14 @@ public class Recrystallisation extends Task {
                 }
             }
             while (dislocations > chunk10percent) {
-                addSmallChunk(chunk10percent);
+                addSmallChunk(chunk10percent, listOfBorderCells, listOfCenterCells);
                 dislocations -= chunk10percent;
                 sumDislocationsDensity += chunk10percent;
             }
-            addSmallChunk(dislocations); //what's left
+            addSmallChunk(dislocations, listOfBorderCells, listOfCenterCells); //what's left
             sumDislocationsDensity += dislocations;
             updateFile(i, sumDislocationsDensity, time);
         }
-        workbook.close();
         crystalliseNucleation(roCritical);
     }
 
@@ -94,6 +98,7 @@ public class Recrystallisation extends Task {
         print();
     }
 
+    //TODO Make print common
     private void print() {
         double pointSize = getPointSize();
         BufferedImage bi = new BufferedImage((int) (width * pointSize), (int) (height * pointSize), BufferedImage.TYPE_INT_RGB);
@@ -163,16 +168,17 @@ public class Recrystallisation extends Task {
         outputStream.close();
     }
 
-    private void addSmallChunk(double chunk) {
+    private void addSmallChunk(double chunk, List listOfBorderCells, List listOfCenterCells) {
         int isOnGrainBorder = generator.nextInt(100);
-        List listOfCells;
+        int nr;
+        Coordinates index;
         if (isOnGrainBorder < 80) { //border gets dislocation
-            listOfCells = initializeBorderList();
+            nr = generator.nextInt(listOfBorderCells.size());
+            index = (Coordinates) listOfBorderCells.get(nr);
         } else { //center gets dislocation
-            listOfCells = initializeCenterList();
+            nr = generator.nextInt(listOfCenterCells.size());
+            index = (Coordinates) listOfCenterCells.get(nr);
         }
-        int nr = generator.nextInt(listOfCells.size());
-        Coordinates index = (Coordinates) listOfCells.get(nr);
         microstructure[(int) index.getX()][(int) index.getY()].addDislocationDensity(chunk);
     }
 

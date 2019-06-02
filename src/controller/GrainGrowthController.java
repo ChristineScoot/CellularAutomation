@@ -304,7 +304,11 @@ public class GrainGrowthController implements Initializable {
 
     @FXML
     private void handleButtonDislocationGrowth() {
-
+        RadioButton borderConditions = (RadioButton) toggleGroupBorderConditions.getSelectedToggle();
+        String borderCond = borderConditions.getText();
+        RecrystallisationGrowth recrystallisationGrowth=new RecrystallisationGrowth(microstructure,gc,borderCond);
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.submit(recrystallisationGrowth);
     }
 
     public void textFieldMCKeyAction(KeyEvent keyEvent) {

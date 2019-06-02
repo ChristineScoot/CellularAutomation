@@ -156,4 +156,40 @@ public class Neighbour {
         numberOfNeighbours.put(colour, numberTmp);
     }
 
+    public boolean checkRecrystiallise() {
+        double sumOfDensityInNeighbours = 0;
+        boolean shouldRecrystallise=false;
+        double densityInCurrent = previousGrainCells[this.row][this.column].getDislocationDensity();
+
+        sumOfDensityInNeighbours = previousGrainCells[row][left].getDislocationDensity();
+        if (previousGrainCells[row][left].isRecrystallised()&& sumOfDensityInNeighbours<densityInCurrent)
+            shouldRecrystallise= true;
+
+        sumOfDensityInNeighbours = previousGrainCells[row][right].getDislocationDensity();
+        if (previousGrainCells[row][right].isRecrystallised()&& sumOfDensityInNeighbours<densityInCurrent)
+            shouldRecrystallise= true;
+
+        sumOfDensityInNeighbours = previousGrainCells[top][column].getDislocationDensity();
+        if (previousGrainCells[top][column].isRecrystallised()&& sumOfDensityInNeighbours<densityInCurrent)
+            shouldRecrystallise= true;
+
+        sumOfDensityInNeighbours = previousGrainCells[bottom][column].getDislocationDensity();
+        if (previousGrainCells[bottom][column].isRecrystallised() && sumOfDensityInNeighbours<densityInCurrent)
+            shouldRecrystallise= true;
+
+        if(shouldRecrystallise)// && sumOfDensityInNeighbours<densityInCurrent)
+            shouldRecrystallise=true;
+        else
+            shouldRecrystallise=false;
+
+        return shouldRecrystallise;
+    }
+
+//    private boolean checkRecrystallisedNeighbour(int row, int column, boolean recrystallised, double sumOfDensityInNeighbours) {
+//        sumOfDensityInNeighbours += previousGrainCells[this.row][this.column].getDislocationDensity();
+//        if (previousGrainCells[row][column].isRecrystallised())
+//            return true;
+//        return recrystallised;
+//    }
+
 }
