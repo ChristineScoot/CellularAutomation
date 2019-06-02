@@ -41,7 +41,7 @@
     <!--Recrystallisation-->
     <Label layoutX="855.0" layoutY="420.0" text="Recrystallisation" />
     <Button layoutX="850.0" layoutY="450.0" minWidth="120" mnemonicParsing="false" onAction="#handleButtonDislocationDistribution" text="Distribute" />
-    <Button layoutX="850.0" layoutY="500.0" minWidth="120" mnemonicParsing="false" onAction="#handleButtonDislocationNucleation" text="Nucleate" />
+    <!--<Button layoutX="850.0" layoutY="500.0" minWidth="120" mnemonicParsing="false" onAction="#handleButtonDislocationNucleation" text="Nucleate" />-->
     <Button layoutX="850.0" layoutY="550.0" minWidth="120" mnemonicParsing="false" onAction="#handleButtonDislocationGrowth" text="Grow" />
 
     <Button layoutX="850.0" layoutY="650.0" minWidth="120" mnemonicParsing="false" onAction="#handleCellularAutomation" text="Back" />

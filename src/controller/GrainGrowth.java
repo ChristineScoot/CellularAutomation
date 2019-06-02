@@ -86,27 +86,27 @@ public class GrainGrowth extends Task {
         while (grew) {
             switch (relation) {
                 case "von Neumann":
-                    Thread.sleep(50);
+                    Thread.sleep(5);
                     grew = calculateVonNeumann();
                     break;
                 case "Moore":
-                    Thread.sleep(50);
+                    Thread.sleep(5);
                     grew = calculateMoore();
                     break;
                 case "hex left":
-                    Thread.sleep(50);
+                    Thread.sleep(5);
                     grew = calculateHexLeft();
                     break;
                 case "hex right":
-                    Thread.sleep(50);
+                    Thread.sleep(5);
                     grew = calculateHexRight();
                     break;
                 case "hex random":
-                    Thread.sleep(50);
+                    Thread.sleep(5);
                     grew = calculateHexRandom();
                     break;
                 case "pent":
-                    Thread.sleep(50);
+                    Thread.sleep(5);
                     grew = calculatePent();
                     break;
                 case "w/radius":

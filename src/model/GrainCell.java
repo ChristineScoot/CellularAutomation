@@ -6,7 +6,7 @@ public class GrainCell implements Cloneable {
     private Coordinates coordinates;
     private int energy = 0;
     private double dislocationDensity = 0;
-    private boolean isRecrystallized = false;
+    private boolean recrystallised = false;
 
     public GrainCell(boolean state) {
         this.state = state;
@@ -54,6 +54,22 @@ public class GrainCell implements Cloneable {
 
     public void addDislocationDensity(double density) {
         this.dislocationDensity += density;
+    }
+
+    public void setDislocationDensity(double dislocationDensity) {
+        this.dislocationDensity = dislocationDensity;
+    }
+
+    public double getDislocationDensity() {
+        return dislocationDensity;
+    }
+
+    public void setRecrystallised(boolean recrystallised) {
+        this.recrystallised = recrystallised;
+    }
+
+    public boolean isRecrystallised() {
+        return recrystallised;
     }
 
     @Override
