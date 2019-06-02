@@ -37,12 +37,12 @@
     <Label layoutX="927.0" layoutY="230.0" text="kt (0.1, 6)" />
     <TextField fx:id="textFieldMCkt" layoutX="927.0" layoutY="250.0" onKeyPressed="#textFieldMCKeyAction" prefHeight="31.0" prefWidth="65.0" text="1" />
     <Button layoutX="850.0" layoutY="300.0" minWidth="120" mnemonicParsing="false" onAction="#handleButtonMonteCarlo" text="MC" />
-    <Button layoutX="850.0" layoutY="350.0" minWidth="120" mnemonicParsing="false" onAction="#handleButtonMonteCarloEnergyColour" text="Show energy" />
+    <Button fx:id="energyButton" layoutX="850.0" layoutY="350.0" minWidth="120" mnemonicParsing="false" onAction="#handleButtonMonteCarloEnergyColour" text="Show energy" />
     <!--Recrystallisation-->
     <Label layoutX="855.0" layoutY="420.0" text="Recrystallisation" />
     <Button layoutX="850.0" layoutY="450.0" minWidth="120" mnemonicParsing="false" onAction="#handleButtonDislocationDistribution" text="Distribute" />
-    <!--<Button layoutX="850.0" layoutY="500.0" minWidth="120" mnemonicParsing="false" onAction="#handleButtonDislocationNucleation" text="Nucleate" />-->
-    <Button layoutX="850.0" layoutY="550.0" minWidth="120" mnemonicParsing="false" onAction="#handleButtonDislocationGrowth" text="Grow" />
+    <Button layoutX="850.0" layoutY="500.0" minWidth="120" mnemonicParsing="false" onAction="#handleButtonDislocationGrowth" text="Grow" />
+    <Button layoutX="850.0" layoutY="550.0" minWidth="120" mnemonicParsing="false" onAction="#handleButtonShowDislocationDensity" text="Show density" />
 
     <Button layoutX="850.0" layoutY="650.0" minWidth="120" mnemonicParsing="false" onAction="#handleCellularAutomation" text="Back" />
 

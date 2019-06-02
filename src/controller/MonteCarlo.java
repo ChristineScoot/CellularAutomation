@@ -1,13 +1,11 @@
 package controller;
 
 import javafx.concurrent.Task;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.canvas.GraphicsContext;
 import model.Coordinates;
 import model.GrainCell;
 import model.Neighbour;
 
-import java.awt.image.BufferedImage;
 import java.util.*;
 
 public class MonteCarlo extends Task {
@@ -88,7 +86,7 @@ public class MonteCarlo extends Task {
                     }
                 }
             }
-            printStep(microstructure);
+            new CanvasController().print(microstructure, microstructure, gc, colourIndicator);
         }
     }
 
@@ -128,35 +126,6 @@ public class MonteCarlo extends Task {
                 break;
         }
         return numberOfNeighbours;
-    }
-
-    private void printStep(GrainCell[][] step) {
-        width = microstructure.length;
-        height = microstructure[0].length;
-        double pointSize = getPointSize();
-        BufferedImage bi = new BufferedImage((int) (width * pointSize), (int) (height * pointSize), BufferedImage.TYPE_INT_RGB);
-        double canvasX;
-        double canvasY = 0.0;
-        for (int i = 0; i < height; i++) {
-            canvasX = 0.0;
-            for (int j = 0; j < width; j++) {
-                if (step[i][j].isState())
-                    for (int k = 0; k < pointSize; k++)
-                        for (int l = 0; l < pointSize; l++) {
-                            if (colourIndicator.equals("energyColour"))
-                                bi.setRGB((int) canvasX + k, (int) canvasY + l, step[i][j].getEnergyColour());
-                            else
-                                bi.setRGB((int) canvasX + k, (int) canvasY + l, step[i][j].getColour());
-                        }
-                else
-                    for (int k = 0; k < pointSize; k++)
-                        for (int l = 0; l < pointSize; l++)
-                            bi.setRGB((int) canvasX + k, (int) canvasY + l, 16777200); //16777215
-                canvasX += pointSize;
-            }
-            canvasY += pointSize;
-        }
-        gc.drawImage(SwingFXUtils.toFXImage(bi, null), 0, 0);
     }
 
     private double getPointSize() {

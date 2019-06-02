@@ -1,21 +1,19 @@
 package controller;
 
 import javafx.concurrent.Task;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.canvas.GraphicsContext;
 import model.Coordinates;
 import model.GrainCell;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 
-import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
 public class Recrystallisation extends Task {
-    private GrainCell[][] microstructure, previousState;
+    private GrainCell[][] microstructure;
     private int width, height;
     private Random generator = new Random();
     private GraphicsContext gc;
@@ -25,13 +23,6 @@ public class Recrystallisation extends Task {
         this.gc = gc;
         this.width = microstructure.length;
         this.height = microstructure[0].length;
-        this.previousState = new GrainCell[height][width];
-    }
-
-    private void updatePreviousGeneration() throws CloneNotSupportedException {
-        for (int i = 0; i < height; i++)
-            for (int j = 0; j < width; j++)
-                previousState[i][j] = (GrainCell) microstructure[i][j].clone();
     }
 
     private void calculate() throws IOException {
@@ -95,41 +86,7 @@ public class Recrystallisation extends Task {
                 }
             }
         }
-        print();
-    }
-
-    //TODO Make print common
-    private void print() {
-        double pointSize = getPointSize();
-        BufferedImage bi = new BufferedImage((int) (width * pointSize), (int) (height * pointSize), BufferedImage.TYPE_INT_RGB);
-        double canvasX;
-        double canvasY = 0.0;
-        for (int i = 0; i < height; i++) {
-            canvasX = 0.0;
-            for (int j = 0; j < width; j++) {
-                if (microstructure[i][j].isState())
-                    for (int k = 0; k < pointSize; k++)
-                        for (int l = 0; l < pointSize; l++) {
-                            if (microstructure[i][j].isRecrystallised())
-                                bi.setRGB((int) canvasX + k, (int) canvasY + l, 0);
-                            else
-                                bi.setRGB((int) canvasX + k, (int) canvasY + l, microstructure[i][j].getColour());
-                        }
-                else
-                    for (int k = 0; k < pointSize; k++)
-                        for (int l = 0; l < pointSize; l++)
-                            bi.setRGB((int) canvasX + k, (int) canvasY + l, 16777200); //16777215
-                canvasX += pointSize;
-            }
-            canvasY += pointSize;
-        }
-        gc.drawImage(SwingFXUtils.toFXImage(bi, null), 0, 0);
-    }
-
-    private double getPointSize() {
-        double pointSizeWidth = gc.getCanvas().getWidth() / width;
-        double pointSizeHeight = gc.getCanvas().getHeight() / height;
-        return (pointSizeWidth < pointSizeHeight ? pointSizeWidth : pointSizeHeight);
+        new CanvasController().print(microstructure, microstructure, gc, "recrystallisation");
     }
 
     private void updateFile(int i, double numberOfDislocations, double timeStep) throws IOException {
@@ -202,7 +159,6 @@ public class Recrystallisation extends Task {
 
     @Override
     protected Object call() throws Exception {
-        updatePreviousGeneration();
         calculate();
         return microstructure;
     }

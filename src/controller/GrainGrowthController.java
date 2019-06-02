@@ -13,12 +13,15 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import model.GrainCell;
+import model.Neighbour;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Map;
 import java.util.Random;
 import java.util.ResourceBundle;
+import java.util.TreeMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -49,6 +52,8 @@ public class GrainGrowthController implements Initializable {
     private TextField textFieldMCkt;
     @FXML
     private TextField textFieldMCIterations;
+    @FXML
+    private Button energyButton;
 
     private GrainGrowth grainGrowth;
     private MonteCarlo monteCarlo;
@@ -56,6 +61,7 @@ public class GrainGrowthController implements Initializable {
     private GraphicsContext gc;
     private Random generator = new Random();
     private int width, height;
+    int clickCount = 0;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -63,7 +69,10 @@ public class GrainGrowthController implements Initializable {
         toggleGroupBorderConditions.getToggles().get(0).setSelected(true);
         gc = canvas.getGraphicsContext2D();
         clear();
-        microstructure = new GrainCell[height][width];
+        energyButton.setOnMousePressed(event -> {
+            clickCount++;
+            System.out.println(clickCount);
+        });
     }
 
     private void clear() {
@@ -75,9 +84,13 @@ public class GrainGrowthController implements Initializable {
             showNegativeError();
         }
         initializeGrainCells = new GrainCell[height][width];
+        microstructure = new GrainCell[height][width];
         for (int i = 0; i < height; i++)
-            for (int j = 0; j < width; j++)
+            for (int j = 0; j < width; j++) {
                 initializeGrainCells[i][j] = new GrainCell(false);
+                microstructure[i][j] = new GrainCell(false);
+            }
+        countEnergy();
     }
 
     private void resetCanvas() {
@@ -94,7 +107,64 @@ public class GrainGrowthController implements Initializable {
     private void initializeChoiceBoxRelation() {
         ObservableList relations = FXCollections.observableArrayList("von Neumann", "Moore", "pent", "hex left", "hex right", "hex random", "w/radius");
         choiceBoxRelation.getItems().setAll(relations);
-        choiceBoxRelation.getSelectionModel().selectFirst();
+        choiceBoxRelation.getSelectionModel().select(1);
+    }
+
+    private void countEnergy() {
+        RadioButton borderConditions = (RadioButton) toggleGroupBorderConditions.getSelectedToggle();
+        String borderCond = borderConditions.getText();
+        for (int row = 0; row < height; row++) {
+            for (int column = 0; column < width; column++) {
+                GrainCell grainCell = microstructure[row][column];
+                Neighbour neighbours = new Neighbour(row, column, borderCond, width, height, microstructure);
+                int J = 1;
+                Map<Integer, Integer> numberOfNeighbours = countNumberOfNeighbours(neighbours);
+                int sum = 0;
+
+                if (numberOfNeighbours.size() > 0) {
+                    for (Map.Entry<Integer, Integer> entry : numberOfNeighbours.entrySet()) {
+                        if (entry.getKey() != grainCell.getColour())
+                            sum += entry.getValue();
+                    }
+                    int energyBefore = J * sum;
+                    grainCell.setEnergy(energyBefore);
+                }
+            }
+        }
+    }
+
+    private Map<Integer, Integer> countNumberOfNeighbours(Neighbour neighbours) {
+        Map<Integer, Integer> numberOfNeighbours = new TreeMap<>();
+        switch (choiceBoxRelation.getValue()) {
+            case "von Neumann":
+                numberOfNeighbours = neighbours.checkVonNeumann();
+                break;
+            case "Moore":
+                numberOfNeighbours = neighbours.checkMoore();
+                break;
+            case "hex left":
+                numberOfNeighbours = neighbours.checkHex(0);
+                break;
+            case "hex right":
+                numberOfNeighbours = neighbours.checkHex(1);
+                break;
+            case "hex random":
+                numberOfNeighbours = neighbours.checkHex(3);
+                break;
+            case "pent":
+                numberOfNeighbours = neighbours.checkPent();
+                break;
+            case "w/radius":
+                numberOfNeighbours = neighbours.checkWithRadius(Integer.parseInt(textFieldRadiusRelation.getText()), getPointSize());
+                break;
+        }
+        return numberOfNeighbours;
+    }
+
+    private int getPointSize() {
+        double pointSizeWidth = gc.getCanvas().getWidth() / width;
+        double pointSizeHeight = gc.getCanvas().getHeight() / height;
+        return (int) (pointSizeWidth < pointSizeHeight ? pointSizeWidth : pointSizeHeight);
     }
 
     @FXML
@@ -277,10 +347,17 @@ public class GrainGrowthController implements Initializable {
 
     @FXML
     private void handleButtonMonteCarloEnergyColour() {
+//        if (monteCarlo != null) {
         if (monteCarlo.getColourIndicator().equals("energyColour"))
             monteCarlo.setColourIndicator("");
         else
             monteCarlo.setColourIndicator("energyColour");
+//        } else {
+        if (clickCount % 2 == 0)
+            new CanvasController().print(microstructure, microstructure, gc, "");
+        else
+            new CanvasController().print(microstructure, microstructure, gc, "energyColour");
+//        }
     }
 
     @FXML
@@ -290,25 +367,18 @@ public class GrainGrowthController implements Initializable {
         executor.submit(recrystallisation);
     }
 
-//    private void showDoneAlert() {
-//        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-//        alert.setTitle("Done!");
-//        alert.setHeaderText("Job done");
-//        alert.showAndWait();
-//    }
-//
-//    @FXML
-//    private void handleButtonDislocationNucleation() {
-//
-//    }
-
     @FXML
     private void handleButtonDislocationGrowth() {
         RadioButton borderConditions = (RadioButton) toggleGroupBorderConditions.getSelectedToggle();
         String borderCond = borderConditions.getText();
-        RecrystallisationGrowth recrystallisationGrowth=new RecrystallisationGrowth(microstructure,gc,borderCond);
+        RecrystallisationGrowth recrystallisationGrowth = new RecrystallisationGrowth(microstructure, gc, borderCond);
         ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(recrystallisationGrowth);
+    }
+
+    @FXML
+    private void handleButtonShowDislocationDensity() {
+
     }
 
     public void textFieldMCKeyAction(KeyEvent keyEvent) {
