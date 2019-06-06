@@ -54,14 +54,23 @@ public class GrainGrowthController implements Initializable {
     private TextField textFieldMCIterations;
     @FXML
     private Button energyButton;
+    @FXML
+    private Button dislocationButton;
+    @FXML
+    private TextField textFieldA;
+    @FXML
+    private TextField textFieldB;
 
     private GrainGrowth grainGrowth;
     private MonteCarlo monteCarlo;
+    private Recrystallisation recrystallisation;
     private GrainCell[][] initializeGrainCells, microstructure;
     private GraphicsContext gc;
     private Random generator = new Random();
     private int width, height;
-    int clickCount = 0;
+    int clickCountEnergy = 0;
+    int clickCountDislocation = 0;
+    int commonColour = 65535;//16777215;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -69,10 +78,8 @@ public class GrainGrowthController implements Initializable {
         toggleGroupBorderConditions.getToggles().get(0).setSelected(true);
         gc = canvas.getGraphicsContext2D();
         clear();
-        energyButton.setOnMousePressed(event -> {
-            clickCount++;
-            System.out.println(clickCount);
-        });
+        energyButton.setOnMousePressed(event -> clickCountEnergy++);
+        dislocationButton.setOnMousePressed(event -> clickCountDislocation++);
     }
 
     private void clear() {
@@ -95,12 +102,10 @@ public class GrainGrowthController implements Initializable {
 
     private void resetCanvas() {
         BufferedImage bi = new BufferedImage((int) canvas.getWidth(), (int) canvas.getHeight(), BufferedImage.TYPE_INT_RGB);
-        for (int i = 0; i < (int) canvas.getWidth(); i++) {
+        for (int i = 0; i < (int) canvas.getWidth(); i++)
             for (int j = 0; j < (int) canvas.getHeight(); j++) {
                 bi.setRGB(i, j, 16777215);
             }
-        }
-
         gc.drawImage(SwingFXUtils.toFXImage(bi, null), 0, 0);
     }
 
@@ -187,7 +192,7 @@ public class GrainGrowthController implements Initializable {
         for (int row = 0; row < numberOfRows; row++) {
             for (int column = 0; column < numberOfColumns; column++) {
                 initializeGrainCells[rowPositionSize * row][columnPositionSize * column].setState(true);
-                initializeGrainCells[rowPositionSize * row][columnPositionSize * column].setColour(((16776960 - 125) / numberOfCells) * (i + 1));
+                initializeGrainCells[rowPositionSize * row][columnPositionSize * column].setColour(((commonColour - 125) / numberOfCells) * (i + 1));
                 i++;
             }
         }
@@ -232,7 +237,7 @@ public class GrainGrowthController implements Initializable {
                 break;
             }
             initializeGrainCells[row][column].setState(true);
-            int colour = ((16776960 - 125) / numberOfCells) * (i + 1);
+            int colour = ((commonColour - 125) / numberOfCells) * (i + 1);
             initializeGrainCells[row][column].setColour(colour);
         }
 
@@ -259,7 +264,7 @@ public class GrainGrowthController implements Initializable {
             }
             while (initializeGrainCells[row][column].isState());
             initializeGrainCells[row][column].setState(true);
-            int colour = ((16776960 - 125) / numberOfCells) * (i + 1);
+            int colour = ((commonColour - 125) / numberOfCells) * (i + 1);
             initializeGrainCells[row][column].setColour(colour);
         }
 
@@ -347,38 +352,30 @@ public class GrainGrowthController implements Initializable {
 
     @FXML
     private void handleButtonMonteCarloEnergyColour() {
-//        if (monteCarlo != null) {
         if (monteCarlo.getColourIndicator().equals("energyColour"))
             monteCarlo.setColourIndicator("");
         else
             monteCarlo.setColourIndicator("energyColour");
-//        } else {
-        if (clickCount % 2 == 0)
-            new CanvasController().print(microstructure, microstructure, gc, "");
+        if (clickCountEnergy % 2 == 0)
+            new CanvasController().print(microstructure, gc, "");
         else
-            new CanvasController().print(microstructure, microstructure, gc, "energyColour");
-//        }
-    }
-
-    @FXML
-    private void handleButtonDislocationDistribution() {
-        Recrystallisation recrystallisation = new Recrystallisation(microstructure, gc);
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.submit(recrystallisation);
+            new CanvasController().print(microstructure, gc, "energyColour");
     }
 
     @FXML
     private void handleButtonDislocationGrowth() {
         RadioButton borderConditions = (RadioButton) toggleGroupBorderConditions.getSelectedToggle();
         String borderCond = borderConditions.getText();
-        RecrystallisationGrowth recrystallisationGrowth = new RecrystallisationGrowth(microstructure, gc, borderCond);
+        double A = Double.parseDouble(textFieldA.getText());
+        double B = Double.parseDouble(textFieldB.getText());
+        recrystallisation = new Recrystallisation(microstructure, gc, A, B, borderCond);
         ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.submit(recrystallisationGrowth);
+        executor.submit(recrystallisation);
     }
 
     @FXML
     private void handleButtonShowDislocationDensity() {
-
+        recrystallisation.setColourIndicator(clickCountDislocation);
     }
 
     public void textFieldMCKeyAction(KeyEvent keyEvent) {

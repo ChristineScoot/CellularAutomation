@@ -7,7 +7,10 @@ import model.GrainCell;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -17,43 +20,32 @@ public class Recrystallisation extends Task {
     private int width, height;
     private Random generator = new Random();
     private GraphicsContext gc;
+    private double A, B;
+    private String borderCond;
+    private RecrystallisationGrowth recrystallisationGrowth;
 
-    public Recrystallisation(GrainCell[][] microstructure, GraphicsContext gc) {
+    public Recrystallisation(GrainCell[][] microstructure, GraphicsContext gc, double A, double B, String borderCond) {
         this.microstructure = microstructure;
         this.gc = gc;
         this.width = microstructure.length;
         this.height = microstructure[0].length;
+        this.A = A;
+        this.B = B;
+        this.borderCond = borderCond;
     }
 
-    private void calculate() throws IOException {
-        //TODO Make it work faster somehow
-        final String recrystallisationData = System.getProperty("user.dir") + "/src/recrystallisation.xls";
-
-        Workbook workbook;
-        try {
-            workbook = WorkbookFactory.create(new File(recrystallisationData));
-        } catch (FileNotFoundException e) {
-            System.out.println("plik juz otwarto");
-            return;
-        }
-        Sheet sheet = workbook.getSheetAt(0);
-        workbook.close();
-
-        int numberOfRows = sheet.getPhysicalNumberOfRows();
-        double time, ro, nextRo, sigma, avgDislocationsInCell, chunk30percent, chunk10percent;
-
-        double roCritical = sheet.getRow(69).getCell(1).getNumericCellValue() / (width * height);
+    private void calculate() throws Exception {
+        double time = 0, ro = 0, nextRo, avgDislocationsInCell, chunk30percent, chunk10percent;
+        double roCritical = ((A / B) + (1 - A / B) * Math.pow(Math.E, (-B * 0.065))) / (width * height);
         double sumDislocationsDensity = 0;
         List listOfBorderCells = initializeBorderList();
         List listOfCenterCells = initializeCenterList();
-        for (int i = 4; i < numberOfRows - 1; i++) {
-            time = sheet.getRow(i).getCell(0).getNumericCellValue();
-            ro = sheet.getRow(i).getCell(1).getNumericCellValue();
-            nextRo = sheet.getRow(i + 1).getCell(1).getNumericCellValue();
-//            sigma = sheet.getRow(i).getCell(2).getNumericCellValue();
+        recrystallisationGrowth = new RecrystallisationGrowth(microstructure, gc, borderCond);
+        for (int i = 0; i <= 200; i++) {
+            System.out.println("Recrystalisation numero: " + (i + 1));
+            nextRo = (A / B) + (1 - A / B) * Math.pow(Math.E, (-B * time));
             avgDislocationsInCell = (nextRo - ro) / (width * height);
             chunk30percent = avgDislocationsInCell * 0.3;
-            chunk10percent = avgDislocationsInCell * 0.1;
             double dislocations = nextRo - ro;
 
             for (int column = 0; column < width; column++) {
@@ -63,6 +55,7 @@ public class Recrystallisation extends Task {
                     sumDislocationsDensity += chunk30percent;
                 }
             }
+            chunk10percent = dislocations * 0.001;
             while (dislocations > chunk10percent) {
                 addSmallChunk(chunk10percent, listOfBorderCells, listOfCenterCells);
                 dislocations -= chunk10percent;
@@ -71,8 +64,13 @@ public class Recrystallisation extends Task {
             addSmallChunk(dislocations, listOfBorderCells, listOfCenterCells); //what's left
             sumDislocationsDensity += dislocations;
             updateFile(i, sumDislocationsDensity, time);
+            ro = nextRo;
+            time += 0.001;
+            crystalliseNucleation(roCritical);
+
+            recrystallisationGrowth.call();
+            recrystallisationGrowth.setMicrostructure(microstructure);
         }
-        crystalliseNucleation(roCritical);
     }
 
     private void crystalliseNucleation(double roCritical) {
@@ -82,11 +80,14 @@ public class Recrystallisation extends Task {
                 dislocations = microstructure[row][column].getDislocationDensity();
                 if (dislocations > roCritical && microstructure[row][column].getEnergy() != 0) {
                     microstructure[row][column].setRecrystallised(true);
-                    microstructure[row][column].setDislocationDensity(roCritical);
+                    microstructure[row][column].setDislocationDensity(0);
+                    int redish = generator.nextInt(255);
+                    redish = redish << 16;
+                    microstructure[row][column].setColour(redish);
                 }
             }
         }
-        new CanvasController().print(microstructure, microstructure, gc, "recrystallisation");
+        new CanvasController().print(microstructure, gc, recrystallisationGrowth.getColourIndicator());
     }
 
     private void updateFile(int i, double numberOfDislocations, double timeStep) throws IOException {
@@ -112,7 +113,7 @@ public class Recrystallisation extends Task {
         cell0.setCellValue("Time step");
         cell1.setCellValue("Dislocation");
 
-        Row row = sheet.createRow(i - 3);
+        Row row = sheet.createRow(i + 1);
         Cell cellDislocation = row.createCell(1);
         Cell cellTime = row.createCell(0);
         cellDislocation.setCellValue(numberOfDislocations);
@@ -155,6 +156,17 @@ public class Recrystallisation extends Task {
                 if (microstructure[row][column].getEnergy() == 0)
                     list.add(new Coordinates(column, row));
         return list;
+    }
+
+    public void setColourIndicator(int clickCountDislocation) {
+        if (recrystallisationGrowth.getColourIndicator().equals("dislocationColour"))
+            recrystallisationGrowth.setColourIndicator("recrystallisation");
+        else
+            recrystallisationGrowth.setColourIndicator("dislocationColour");
+        if (clickCountDislocation % 2 == 0)
+            new CanvasController().print(microstructure, gc, "recrystallisation");
+        else
+            new CanvasController().print(microstructure, gc, "dislocationColour");
     }
 
     @Override

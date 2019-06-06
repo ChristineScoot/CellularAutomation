@@ -10,7 +10,7 @@ public class CanvasController {
     private int width, height;
     private GraphicsContext gc;
 
-    public void print(GrainCell[][] microstructure, GrainCell[][] previousState, GraphicsContext gc, String colourIndicator) {
+    public void print(GrainCell[][] microstructure, GraphicsContext gc, String colourIndicator) {
         this.gc = gc;
         this.width = microstructure.length;
         this.height = microstructure[0].length;
@@ -25,13 +25,15 @@ public class CanvasController {
                     for (int k = 0; k < pointSize; k++)
                         for (int l = 0; l < pointSize; l++) {
                             if (colourIndicator.equals("recrystallisation"))
-                                if (previousState[i][j].isRecrystallised())
-                                    bi.setRGB((int) canvasX + k, (int) canvasY + l, 0);
-                                else
-                                    bi.setRGB((int) canvasX + k, (int) canvasY + l, microstructure[i][j].getColour());
+                                bi.setRGB((int) canvasX + k, (int) canvasY + l, microstructure[i][j].getColour());
                             else if (colourIndicator.equals("energyColour")) {
                                 if (colourIndicator.equals("energyColour"))
                                     bi.setRGB((int) canvasX + k, (int) canvasY + l, microstructure[i][j].getEnergyColour());
+                                else
+                                    bi.setRGB((int) canvasX + k, (int) canvasY + l, microstructure[i][j].getColour());
+                            } else if (colourIndicator.equals("dislocationColour")) {
+                                if (colourIndicator.equals("dislocationColour"))
+                                    bi.setRGB((int) canvasX + k, (int) canvasY + l, microstructure[i][j].getDislocationColour());
                                 else
                                     bi.setRGB((int) canvasX + k, (int) canvasY + l, microstructure[i][j].getColour());
                             } else

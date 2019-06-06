@@ -10,6 +10,7 @@ public class Neighbour {
     private String boundaryCondition;
     private GrainCell[][] previousGrainCells;
     private Map<Integer, Integer> numberOfNeighbours = new TreeMap<>();
+    private Map<Integer, Integer> numberOfRecrystallisedNeighbours = new TreeMap<>();
     private Random generator = new Random();
 
 
@@ -114,7 +115,7 @@ public class Neighbour {
         double maxX, minX, maxY, minY;
 
         for (int neighRow = 0; neighRow < height; neighRow++)
-            for (int neighColumn = 0; neighColumn < width; neighColumn++) {
+            for (int neighColumn = 0; neighColumn < width; neighColumn++)
                 if (previousGrainCells[neighRow][neighColumn].isState()) {
                     maxX = previousGrainCells[neighRow][neighColumn].getCoordinates().getX();
                     minX = previousGrainCells[row][column].getCoordinates().getX();
@@ -139,7 +140,6 @@ public class Neighbour {
                             getNeighboursValues(neighRow, neighColumn, numberOfNeighbours);
                     }
                 }
-            }
         return numberOfNeighbours;
     }
 
@@ -155,32 +155,61 @@ public class Neighbour {
         numberOfNeighbours.put(colour, numberTmp);
     }
 
-    public boolean checkRecrystiallise() {
-        double sumOfDensityInNeighbours;
+    public boolean checkRecrystallise() {
+        double maxDensityInNeighbours = 0;
         boolean shouldRecrystallise = false;
         double densityInCurrent = previousGrainCells[this.row][this.column].getDislocationDensity();
 
-        sumOfDensityInNeighbours = previousGrainCells[row][left].getDislocationDensity();
-        if (previousGrainCells[row][left].isRecrystallised() && sumOfDensityInNeighbours < densityInCurrent)
+        if (previousGrainCells[row][left].isRecrystallised()) {// && maxDensityInNeighbours < densityInCurrent) {
+            int numberTmp = 1;
+            int colour = previousGrainCells[row][left].getColour();
+            if (numberOfRecrystallisedNeighbours.containsKey(colour))
+                numberTmp = numberOfRecrystallisedNeighbours.get(colour) + 1;
+            numberOfRecrystallisedNeighbours.put(colour, numberTmp);
             shouldRecrystallise = true;
+        } else if (maxDensityInNeighbours < previousGrainCells[row][left].getDislocationDensity())
+            maxDensityInNeighbours = previousGrainCells[row][left].getDislocationDensity();
 
-        sumOfDensityInNeighbours = previousGrainCells[row][right].getDislocationDensity();
-        if (previousGrainCells[row][right].isRecrystallised() && sumOfDensityInNeighbours < densityInCurrent)
+        if (previousGrainCells[row][right].isRecrystallised()) {
+            int numberTmp = 1;
+            int colour = previousGrainCells[row][right].getColour();
+            if (numberOfRecrystallisedNeighbours.containsKey(colour))
+                numberTmp = numberOfRecrystallisedNeighbours.get(colour) + 1;
+            numberOfRecrystallisedNeighbours.put(colour, numberTmp);
             shouldRecrystallise = true;
+        } else if (maxDensityInNeighbours < previousGrainCells[row][right].getDislocationDensity())
+            maxDensityInNeighbours = previousGrainCells[row][right].getDislocationDensity();
 
-        sumOfDensityInNeighbours = previousGrainCells[top][column].getDislocationDensity();
-        if (previousGrainCells[top][column].isRecrystallised() && sumOfDensityInNeighbours < densityInCurrent)
+        if (previousGrainCells[top][column].isRecrystallised()) {
+            int numberTmp = 1;
+            int colour = previousGrainCells[top][column].getColour();
+            if (numberOfRecrystallisedNeighbours.containsKey(colour))
+                numberTmp = numberOfRecrystallisedNeighbours.get(colour) + 1;
+            numberOfRecrystallisedNeighbours.put(colour, numberTmp);
             shouldRecrystallise = true;
+        } else if (maxDensityInNeighbours < previousGrainCells[top][column].getDislocationDensity())
+            maxDensityInNeighbours = previousGrainCells[top][column].getDislocationDensity();
 
-        sumOfDensityInNeighbours = previousGrainCells[bottom][column].getDislocationDensity();
-        if (previousGrainCells[bottom][column].isRecrystallised() && sumOfDensityInNeighbours < densityInCurrent)
+        if (previousGrainCells[bottom][column].isRecrystallised()) {
+            int numberTmp = 1;
+            int colour = previousGrainCells[bottom][column].getColour();
+            if (numberOfRecrystallisedNeighbours.containsKey(colour))
+                numberTmp = numberOfRecrystallisedNeighbours.get(colour) + 1;
+            numberOfRecrystallisedNeighbours.put(colour, numberTmp);
             shouldRecrystallise = true;
+        } else if (maxDensityInNeighbours < previousGrainCells[bottom][column].getDislocationDensity())
+            maxDensityInNeighbours = previousGrainCells[bottom][column].getDislocationDensity();
 
         if (shouldRecrystallise)
-            shouldRecrystallise = true;
-        else
-            shouldRecrystallise = false;
+            if (maxDensityInNeighbours < densityInCurrent)
+                shouldRecrystallise = true;
+            else
+                shouldRecrystallise = false;
 
         return shouldRecrystallise;
+    }
+
+    public Map<Integer, Integer> getRecrystallisedNeighbours() {
+        return numberOfRecrystallisedNeighbours;
     }
 }

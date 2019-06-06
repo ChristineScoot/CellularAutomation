@@ -86,7 +86,7 @@ public class MonteCarlo extends Task {
                     }
                 }
             }
-            new CanvasController().print(microstructure, microstructure, gc, colourIndicator);
+            new CanvasController().print(microstructure, gc, colourIndicator);
         }
     }
 

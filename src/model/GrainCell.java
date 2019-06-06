@@ -37,7 +37,13 @@ public class GrainCell implements Cloneable {
         if (energy == 0)
             return 0;
         return (int) (0.125 * energy * 255); //very dark bluish
-//        return (int)(0.125*energy*35280+255);
+    }
+
+    public int getDislocationColour() {
+        if (!recrystallised) { //blue
+            return 100;
+        }
+        return (int) ((dislocationDensity / 4.68) * 65536);
     }
 
     public Coordinates getCoordinates() {
